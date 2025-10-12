@@ -23,7 +23,7 @@ const Sidebar = () => {
       name: 'bububuenas',
       category: 'Charlando',
       viewers: 57,
-      avatar: 'https://n9.cl/mlxh1',
+      avatar: 'https://cdna.artstation.com/p/assets/images/images/036/064/094/large/noa-garzon-pp-twitch-con-fondo.jpg?1616623918',
       categoryImage: 'https://static-cdn.jtvnw.net/ttv-boxart/509658-40x53.jpg'
     }
   ];

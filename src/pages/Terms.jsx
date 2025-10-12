@@ -1,10 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Terms = () => {
   return (
     <div className="main-content">
       <div className="content">
         <div className="page-content">
+          <div className="university-logo">
+            <img src="/images/ulima.png" alt="Logo Universidad" />
+          </div>
           <h1 className="page-title">Términos y Condiciones</h1>
           
           <div className="page-section">
@@ -82,6 +86,12 @@ const Terms = () => {
               Si tienes preguntas sobre estos términos y condiciones, puedes contactarnos 
               a través de nuestros canales oficiales de soporte.
             </p>
+          </div>
+
+          <div className="back-button-container">
+            <Link to="/" className="back-button">
+              Regresar
+            </Link>
           </div>
         </div>
       </div>

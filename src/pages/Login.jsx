@@ -30,7 +30,12 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
     
     if (result.success) {
-      navigate('/');
+      // Redirigir según el rol del usuario
+      if (result.user.role === 'streamer') {
+        navigate('/dashboard');
+      } else {
+        navigate('/');
+      }
     } else {
       setError(result.error);
     }

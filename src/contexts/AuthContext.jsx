@@ -55,18 +55,25 @@ export const AuthProvider = ({ children }) => {
         id: registeredUser.id,
         email: registeredUser.email,
         username: registeredUser.username,
-        profilePicture: registeredUser.profilePicture
+        profilePicture: registeredUser.profilePicture,
+        role: registeredUser.role || 'user',
+        gems: registeredUser.gems || 1000,
+        level: registeredUser.level || 1,
+        points: registeredUser.points || 0,
+        pointsToNextLevel: registeredUser.pointsToNextLevel || 100,
+        streamingHours: registeredUser.streamingHours || 0,
+        totalStreams: registeredUser.totalStreams || 0
       };
 
       setUser(userData);
       localStorage.setItem('currentUser', JSON.stringify(userData));
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       return { success: false, error: 'Error al iniciar sesión' };
     }
   };
 
-  const register = async (username, email, password, confirmPassword, profilePicture) => {
+  const register = async (username, email, password, confirmPassword, profilePicture, role = 'user') => {
     try {
       if (!username || username.length < 3) {
         return { success: false, error: 'El nombre de usuario debe tener al menos 3 caracteres' };
@@ -98,7 +105,14 @@ export const AuthProvider = ({ children }) => {
         email,
         username,
         password,
-        profilePicture: profilePictureUrl
+        profilePicture: profilePictureUrl,
+        role: role,
+        gems: 1000, // Gemas iniciales
+        level: 1,
+        points: 0,
+        pointsToNextLevel: 100,
+        streamingHours: 0,
+        totalStreams: 0
       };
 
       saveRegisteredUser(userData);
@@ -107,7 +121,14 @@ export const AuthProvider = ({ children }) => {
         id: userData.id,
         email: userData.email,
         username: userData.username,
-        profilePicture: userData.profilePicture
+        profilePicture: userData.profilePicture,
+        role: userData.role,
+        gems: userData.gems,
+        level: userData.level,
+        points: userData.points,
+        pointsToNextLevel: userData.pointsToNextLevel,
+        streamingHours: userData.streamingHours,
+        totalStreams: userData.totalStreams
       };
 
       setUser(sessionData);

@@ -13,6 +13,9 @@ import Dashboard from './pages/Dashboard';
 import StreamView from './pages/StreamView';
 import Categorias from './pages/Categorias';
 import './App.css';
+import PaymentMethods from './pages/PaymentMethods';
+import VVCoins from './pages/VVCoins';
+import RegalosSubs from "./pages/RegalosSubs";
 
 function App() {
   return (
@@ -30,7 +33,10 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/stream/:id" element={<StreamView />} />
-              <Route path="/categorias" element={<Categorias />} />
+            <Route path="/categorias" element={<Categorias />} />
+            <Route path="/payment" element={<PaymentMethods />} />
+            <Route path="/coins" element={<VVCoins />} />
+            <Route path="/regalossubs" element={<RegalosSubs />} />
           </Routes>
         </div>
       </Router>

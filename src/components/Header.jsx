@@ -44,11 +44,15 @@ const Header = () => {
         <nav className="nav-menu">
           <Link to="/" className="nav-item">Siguiendo</Link>
           <Link to="/categorias" className="nav-item">Categorías</Link>
+          <Link to="/RegalosSubs" className="nav-item">Regalos para Seguidores</Link>
         </nav>
       </div>
       <div className="header-right" ref={dropdownRef}>
         {!user ? (
           <div className="auth-buttons">
+            <Link to="/Coins" className="auth-btn register-btn">
+              Comprar VVCoins
+            </Link>
             <Link to="/login" className="auth-btn login-btn">
               Iniciar Sesión
             </Link>

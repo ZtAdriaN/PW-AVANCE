@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const About = () => {
   return (
@@ -50,6 +51,61 @@ const About = () => {
               canales oficiales. Valoramos tu feedback y trabajamos constantemente para mejorar 
               la experiencia de nuestra comunidad.
             </p>
+          </div>
+
+          <div className="page-section">
+            <h2>Nuestro Equipo</h2>
+            <p>Conoce a los miembros del equipo que hacen posible StreamHub:</p>
+            
+            <div className="team-grid">
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="../images/almudena.jpg" alt="Almudena Rodriguez" />
+                </div>
+                <h3>Almudena Rodriguez</h3>
+              </div>
+
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="../images/andrew.png" alt="Andrew Tamayo" />
+                </div>
+                <h3>Andrew Tamayo</h3>
+              </div>
+
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="/path/to/member3.jpg" alt="Dante Chávez" />
+                </div>
+                <h3>Dante Chávez</h3>
+              </div>
+
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="/path/to/member4.jpg" alt="Sherlock Castañeda" />
+                </div>
+                <h3>Sherlock Castañeda</h3>
+              </div>
+
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="/path/to/member5.jpg" alt="Gabriel Gutiérrez" />
+                </div>
+                <h3>Gabriel Gutiérrez</h3>
+              </div>
+
+              <div className="team-member">
+                <div className="team-photo">
+                  <img src="/path/to/member6.jpg" alt="Mateo Ortega" />
+                </div>
+                <h3>Mateo Ortega</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="back-button-container">
+            <Link to="/" className="back-button">
+              Regresar
+            </Link>
           </div>
         </div>
       </div>

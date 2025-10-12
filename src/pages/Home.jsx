@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 const Home = () => {
@@ -9,7 +10,7 @@ const Home = () => {
       streamer: 'peoplelite',
       category: 'Fortnite',
       viewers: 38,
-      thumbnail: 'https://n9.cl/1e515',
+      thumbnail: '../images/stream1.jpg',
       isLive: true
     },
     {
@@ -18,7 +19,7 @@ const Home = () => {
       streamer: 'eldonstark82',
       category: 'Valorant',
       viewers: 35,
-      thumbnail: 'https://n9.cl/are5o',
+      thumbnail: '../images/stream2.png',
       isLive: true
     },
     {
@@ -27,7 +28,7 @@ const Home = () => {
       streamer: 'bububuenas',
       category: 'Charlando',
       viewers: 57,
-      thumbnail: 'https://n9.cl/9divo',
+      thumbnail: 'https://static-cdn.jtvnw.net/twitch-clips-thumbnails-prod/AmazonianUnusualQueleaBCouch-_swqhJT9jpqhuYH_/7125d082-fd52-4c37-9cfc-8dfa3c30f4d6/preview.jpg',
       isLive: true
     },
     {
@@ -36,7 +37,7 @@ const Home = () => {
       streamer: 'microbusero',
       category: 'PEAK',
       viewers: 71,
-      thumbnail: 'https://n9.cl/ol10p',
+      thumbnail: '../images/stream4.jpg',
       isLive: true
     },
     {
@@ -45,7 +46,7 @@ const Home = () => {
       streamer: 'nezumivy',
       category: 'DEVOUR',
       viewers: 811,
-      thumbnail: 'https://n9.cl/3k34u',
+      thumbnail: '../images/stream5.jpg',
       isLive: true
     },
     {
@@ -54,7 +55,7 @@ const Home = () => {
       streamer: 'gamer_pro',
       category: 'Peak',
       viewers: 234,
-      thumbnail: 'https://n9.cl/yiax7',
+      thumbnail: '../images/stream6.jpg',
       isLive: true
     }
   ];
@@ -200,18 +201,20 @@ const Home = () => {
           <h2 className="section-title">Canales en directo que podrían gustarte</h2>
           <div className="stream-grid">
             {liveStreams.map(stream => (
-              <div key={stream.id} className="stream-card">
-                <div className="stream-thumbnail">
-                  <img src={stream.thumbnail} alt={stream.title} />
-                  {stream.isLive && <div className="stream-overlay">EN DIRECTO</div>}
-                  <div className="stream-viewers">{stream.viewers} espectadores</div>
+              <Link key={stream.id} to={`/stream/${stream.id}`} className="stream-card-link">
+                <div className="stream-card">
+                  <div className="stream-thumbnail">
+                    <img src={stream.thumbnail} alt={stream.title} />
+                    {stream.isLive && <div className="stream-overlay">EN DIRECTO</div>}
+                    <div className="stream-viewers">{stream.viewers} espectadores</div>
+                  </div>
+                  <div className="stream-info">
+                    <h3 className="stream-title">{stream.title}</h3>
+                    <p className="stream-streamer">{stream.streamer}</p>
+                    <p className="stream-category">{stream.category}</p>
+                  </div>
                 </div>
-                <div className="stream-info">
-                  <h3 className="stream-title">{stream.title}</h3>
-                  <p className="stream-streamer">{stream.streamer}</p>
-                  <p className="stream-category">{stream.category}</p>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

@@ -8,6 +8,10 @@ import Terms from './pages/Terms';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Users from './pages/Users';
+import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
+import StreamView from './pages/StreamView';
+import Categorias from './pages/Categorias';
 import './App.css';
 
 function App() {
@@ -23,6 +27,10 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/stream/:id" element={<StreamView />} />
+              <Route path="/categorias" element={<Categorias />} />
           </Routes>
         </div>
       </Router>

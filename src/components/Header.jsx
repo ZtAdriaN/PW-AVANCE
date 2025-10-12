@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+// Imágenes de ejemplo, ajusta las rutas según tu estructura
+const categoriasData = [
+  { img: '/images/valorant.png', titulo: 'VALORANT', espectadores: '28.978 espectadores' },
+  { img: '/images/charlando.jpg', titulo: 'Charlando', espectadores: '306.858 espectadores' },
+  { img: '/images/lol.png', titulo: 'League of Legends', espectadores: '68.932 espectadores' },
+  // ...agrega más categorías aquí
+];
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [showCategorias, setShowCategorias] = useState(false);
   const dropdownRef = useRef(null);
   const { user, logout } = useAuth();
 
@@ -35,7 +43,7 @@ const Header = () => {
         <Link to="/" className="logo">VeVo</Link>
         <nav className="nav-menu">
           <Link to="/" className="nav-item">Siguiendo</Link>
-          <Link to="/" className="nav-item">Categorías</Link>
+          <Link to="/categorias" className="nav-item">Categorías</Link>
         </nav>
       </div>
       <div className="header-right" ref={dropdownRef}>
@@ -50,6 +58,10 @@ const Header = () => {
           </div>
         ) : (
           <div className="user-info">
+            <div className="user-gems">
+              <span className="gems-icon">💎</span>
+              <span className="gems-count">{user.gems?.toLocaleString() || 0}</span>
+            </div>
             <img 
               src={user.profilePicture} 
               alt={user.username}
@@ -69,9 +81,17 @@ const Header = () => {
           {dropdownOpen && (
             <div className="dropdown-menu">
               {user && (
-                <button className="dropdown-item logout-btn" onClick={handleLogout}>
-                  Cerrar Sesión
-                </button>
+                <>
+                  <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    Mi Perfil
+                  </Link>
+                  <Link to="/dashboard" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    Dashboard
+                  </Link>
+                  <button className="dropdown-item logout-btn" onClick={handleLogout}>
+                    Cerrar Sesión
+                  </button>
+                </>
               )}
               <Link to="/about" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
                 Acerca de nosotros

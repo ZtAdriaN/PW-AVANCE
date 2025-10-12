@@ -8,7 +8,8 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    profilePicture: null
+    profilePicture: null,
+    role: 'user'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -58,10 +59,15 @@ const Register = () => {
     setLoading(true);
     setError('');
 
-    const result = await register(formData.username, formData.email, formData.password, formData.confirmPassword, formData.profilePicture);
+    const result = await register(formData.username, formData.email, formData.password, formData.confirmPassword, formData.profilePicture, formData.role);
     
     if (result.success) {
-      navigate('/');
+      // Redirigir según el rol
+      if (formData.role === 'streamer') {
+        navigate('/dashboard');
+      } else {
+        navigate('/');
+      }
     } else {
       setError(result.error);
     }
@@ -169,6 +175,20 @@ const Register = () => {
                 )}
               </button>
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="role">Tipo de Cuenta *</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="user">Usuario</option>
+              <option value="streamer">Streamer</option>
+            </select>
           </div>
 
           <div className="form-group">

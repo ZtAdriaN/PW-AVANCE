@@ -11,7 +11,23 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+    return storedUser ? { ...storedUser, points: storedUser.points ?? 0 } : null;
+  });
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("currentUser", JSON.stringify(user));
+    }
+  }, [user]);
+  const handleDonate = (amount, message, isAnonymous) => {
+    setUser(prev => {
+      if (!prev) return prev;
+      return { ...prev, gems: prev.gems - amount };
+    });
+    console.log(`Donaste ${amount} gemas a ${message || 'sin mensaje'}!`);
+  };
+
   const [loading, setLoading] = useState(true);
 
   const getRegisteredUsers = () => {
@@ -146,6 +162,8 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
+    handleDonate,
     login,
     register,
     logout,

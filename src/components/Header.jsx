@@ -44,6 +44,7 @@ const Header = () => {
         <nav className="nav-menu">
           <Link to="/" className="nav-item">Siguiendo</Link>
           <Link to="/categorias" className="nav-item">Categorías</Link>
+          <Link to="/Coins" className='nav-item'>Comprar 💎</Link>
         </nav>
       </div>
       <div className="header-right" ref={dropdownRef}>
@@ -62,6 +63,11 @@ const Header = () => {
               <span className="gems-icon">💎</span>
               <span className="gems-count">{user.gems?.toLocaleString() || 0}</span>
             </div>
+            {user?.role==="user"&&(
+              <Link to="/RegalosSubs" className="nav-item">
+                Regalos para Seguidores
+              </Link>
+            )}
             <img 
               src={user.profilePicture} 
               alt={user.username}

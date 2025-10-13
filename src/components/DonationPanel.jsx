@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-
+import { useAuth } from '../contexts/AuthContext.jsx';
 const DonationPanel = ({ onDonate, userGems, streamerName }) => {
+  const { user, setUser } = useAuth();
   const [selectedAmount, setSelectedAmount] = useState(50);
   const [customAmount, setCustomAmount] = useState('');
   const [message, setMessage] = useState('');
@@ -33,13 +34,23 @@ const DonationPanel = ({ onDonate, userGems, streamerName }) => {
     if (!canDonate()) return;
     setShowConfirmation(true);
   };
+  const handleDonate = (amount, message, isAnonymous) => {
+    const updatedUser = { ...user, gems: user.gems - amount };
+    setUser(updatedUser); // React se vuelve a renderizar
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+    // Aquí podrías enviar info de mensaje/anónimo a un servidor si quieres
+  };
 
   const confirmDonation = () => {
     const amount = getFinalAmount();
-    onDonate(amount, message, isAnonymous);
-    
+    if (amount > userGems) return alert("No tienes suficientes gemas");
+    const updatedUser = { ...user, gems: user.gems - amount };
+    setUser(updatedUser);
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    onDonate(amount, message, isAnonymous); // Esto actualiza el estado del padre
+
     // Reset form
-    setSelectedAmount(50);
     setCustomAmount('');
     setMessage('');
     setIsAnonymous(false);
@@ -143,9 +154,9 @@ const DonationPanel = ({ onDonate, userGems, streamerName }) => {
           onClick={handleDonateClick}
           disabled={!canDonate()}
         >
-          {!canDonate() 
-            ? getFinalAmount() > userGems 
-              ? 'Gemas Insuficientes' 
+          {!canDonate()
+            ? getFinalAmount() > userGems
+              ? 'Gemas Insuficientes'
               : 'Ingresa una cantidad'
             : `Donar ${getFinalAmount()} 💎`
           }

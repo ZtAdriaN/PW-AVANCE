@@ -2312,3 +2312,59 @@ button {
     gap: 10px;
   }
 }
+/* =================== RegalosSubs =================== */
+.regalos-grid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.regalos-card {
+  background: var(--twitch-gray);
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  width: 250px;
+}
+
+.regalos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.regalo-item {
+  background: var(--twitch-dark);
+  border: none;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  color: var(--twitch-text);
+  width: 100%;
+}
+
+.regalo-item:hover {
+  background: var(--twitch-hover);
+  transform: scale(1.05);
+}
+
+.regalo-img img {
+  max-width: 80px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+
+.regalo-item p {
+  margin: 0.5rem 0 0;
+  font-weight: bold;
+}
+
+.regalo-item span {
+  display: block;
+  color: var(--twitch-accent);
+  margin-top: 0.3rem;
+}

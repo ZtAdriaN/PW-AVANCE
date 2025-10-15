@@ -25,9 +25,13 @@ const SearchBar = () => {
       return;
     }
     const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+    console.log("🔍 Usuarios en localStorage:", users);
+    console.log("🔍 Buscando término:", searchTerm);
+    
     const results = users.filter((u) =>
       u.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    console.log("🔍 Resultados encontrados:", results);
     setSearchResults(results);
   }, [searchTerm]);
 

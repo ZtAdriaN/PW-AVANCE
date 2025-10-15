@@ -53,17 +53,30 @@ const Profile = () => {
   // Obtener los datos más actualizados (localStorage puede tener datos más recientes)
   const getCurrentUserData = () => {
     try {
+      const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+      const found = users.find(u => u.id === user.id);
+      if (found) {
+        return {
+          ...user,
+          level: Math.max(user.level || 1, found.level || 1),
+          points: found.points !== undefined ? found.points : user.points,
+          pointsToNextLevel: found.pointsToNextLevel || user.pointsToNextLevel,
+          gems: found.gems !== undefined ? found.gems : user.gems,
+          totalStreams: found.totalStreams || 0,
+          streamingHours: found.streamingHours || 0
+        };
+      }
+      // Fallback a currentUser si no está en registeredUsers
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
       if (currentUser && currentUser.id === user.id) {
-        // Usar datos del localStorage si están más actualizados
         return {
           ...user,
           level: Math.max(user.level || 1, currentUser.level || 1),
           points: currentUser.points !== undefined ? currentUser.points : user.points,
           pointsToNextLevel: currentUser.pointsToNextLevel || user.pointsToNextLevel,
           gems: currentUser.gems !== undefined ? currentUser.gems : user.gems,
-          totalStreams: Math.max(user.totalStreams || 0, currentUser.totalStreams || 0),
-          streamingHours: Math.max(user.streamingHours || 0, currentUser.streamingHours || 0)
+          totalStreams: currentUser.totalStreams || 0,
+          streamingHours: currentUser.streamingHours || 0
         };
       }
     } catch (error) {

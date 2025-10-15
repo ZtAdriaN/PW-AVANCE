@@ -1,21 +1,24 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import Header from './components/Header';
-import Home from './pages/Home';
-import About from './pages/About';
-import Terms from './pages/Terms';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Users from './pages/Users';
-import Profile from './pages/Profile';
-import Dashboard from './pages/Dashboard';
-import StreamView from './pages/StreamView';
-import Categorias from './pages/Categorias';
-import './App.css';
-import PaymentMethods from './pages/PaymentMethods';
-import VVCoins from './pages/VVCoins';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Header from "./components/Header";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Terms from "./pages/Terms";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Users from "./pages/Users";
+import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
+import StreamView from "./pages/StreamView";
+import Categorias from "./pages/Categorias";
+import "./App.css";
+import PaymentMethods from "./pages/PaymentMethods";
+import VVCoins from "./pages/VVCoins";
 import RegalosSubs from "./pages/RegalosSubs";
+import StreamerStore from "./pages/StreamerStore";
+import StoreView from "./pages/StoreView";
+import PublicProfile from "./pages/PublicProfile";
 
 function App() {
   return (
@@ -37,6 +40,9 @@ function App() {
             <Route path="/payment" element={<PaymentMethods />} />
             <Route path="/coins" element={<VVCoins />} />
             <Route path="/regalossubs" element={<RegalosSubs />} />
+            <Route path="/mi-tienda" element={<StreamerStore />} />
+            <Route path="/tienda/:streamerId" element={<StoreView />} />
+            <Route path="/user/:id" element={<PublicProfile />} />
           </Routes>
         </div>
       </Router>

@@ -1,0 +1,125 @@
+.store-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.store-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.store-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.store-input {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  flex: 1 1 200px;
+  font-size: 1rem;
+}
+
+.store-button {
+  padding: 0.6rem 1.2rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.store-button:hover {
+  background-color: #4338ca;
+}
+
+.store-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.store-empty {
+  text-align: center;
+  color: #555;
+}
+
+.store-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.store-item-card {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.store-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 16px rgba(0,0,0,0.12);
+}
+
+.store-item-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.store-item-card p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.store-item-delete {
+  margin-top: auto;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.store-item-delete:hover {
+  background-color: #b91c1c;
+}
+
+@media screen and (max-width: 768px) {
+  .store-form {
+    flex-direction: column;
+  }
+}
+
+/* Reusa las clases de StreamerStore */
+
+.store-item-buy {
+  margin-top: auto;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #10b981; /* verde estilo "comprar" */
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.store-item-buy:hover {
+  background-color: #059669;
+}

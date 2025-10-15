@@ -8,7 +8,7 @@ import "./StreamOverlay.css";
 import LevelUpToast from "../components/LevelUpToast";
 
 const StreamOverlay = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -113,10 +113,43 @@ const StreamOverlay = () => {
       setLevel(simulatedHours);
       setShowLevelUp(true);
       prevLevelRef.current = simulatedHours;
-      // Guardar nivel en localStorage para reflejar en Mi Perfil
+      
+      // Actualizar el nivel en el contexto de autenticación y localStorage
       if (user?.id) {
-        localStorage.setItem(`level_${user.id}`, simulatedHours);
+        const newLevel = simulatedHours;
+        const newPointsToNextLevel = Math.floor(100 * Math.pow(1.2, newLevel - 1));
+        
+        // Actualizar el estado del contexto inmediatamente
+        setUser(prevUser => ({
+          ...prevUser,
+          level: newLevel,
+          points: 0, // Reset points when leveling up through streaming
+          pointsToNextLevel: newPointsToNextLevel
+        }));
+        
+        // Actualizar currentUser con el nuevo nivel
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (currentUser) {
+          currentUser.level = newLevel;
+          currentUser.points = 0;
+          currentUser.pointsToNextLevel = newPointsToNextLevel;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        }
+        
+        // Actualizar en registeredUsers también
+        let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+        users = users.map(u => u.id === user.id ? { 
+          ...u, 
+          level: newLevel,
+          points: 0,
+          pointsToNextLevel: newPointsToNextLevel
+        } : u);
+        localStorage.setItem("registeredUsers", JSON.stringify(users));
+        
+        // Mantener compatibilidad con la clave anterior
+        localStorage.setItem(`level_${user.id}`, newLevel);
       }
+      
       // Ocultar toast después de 3 segundos
       setTimeout(() => setShowLevelUp(false), 3000);
     }

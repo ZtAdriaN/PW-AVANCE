@@ -4,8 +4,37 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Profile = () => {
   const { user } = useAuth();
-  const localStreams = user.totalStreams;
-  const localHours = user.streamingHours;
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  
+  // Forzar re-render cuando cambie el nivel del usuario
+  React.useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, [user?.level, user?.points, user?.gems, user?.totalStreams, user?.streamingHours]);
+  
+  // Verificar si hay actualizaciones en localStorage
+  React.useEffect(() => {
+    const checkForUpdates = () => {
+      if (user?.id) {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (currentUser && currentUser.id === user.id) {
+          // Si el localStorage tiene datos más recientes, forzar actualización
+          if (currentUser.level !== user.level || 
+              currentUser.points !== user.points || 
+              currentUser.gems !== user.gems ||
+              currentUser.totalStreams !== user.totalStreams ||
+              currentUser.streamingHours !== user.streamingHours) {
+            setRefreshKey(prev => prev + 1);
+          }
+        }
+      }
+    };
+
+    const interval = setInterval(checkForUpdates, 1000); // Verificar cada segundo
+    return () => clearInterval(interval);
+  }, [user]);
+  
+  const localStreams = user?.totalStreams || 0;
+  const localHours = user?.streamingHours || 0;
 
   if (!user) {
     return (
@@ -21,9 +50,31 @@ const Profile = () => {
     );
   }
 
-  const progressPercentage = (user.points / user.pointsToNextLevel) * 100;
-  // Mostrar siempre el nivel del contexto global
-  const displayLevel = user.level;
+  // Obtener los datos más actualizados (localStorage puede tener datos más recientes)
+  const getCurrentUserData = () => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (currentUser && currentUser.id === user.id) {
+        // Usar datos del localStorage si están más actualizados
+        return {
+          ...user,
+          level: Math.max(user.level || 1, currentUser.level || 1),
+          points: currentUser.points !== undefined ? currentUser.points : user.points,
+          pointsToNextLevel: currentUser.pointsToNextLevel || user.pointsToNextLevel,
+          gems: currentUser.gems !== undefined ? currentUser.gems : user.gems,
+          totalStreams: Math.max(user.totalStreams || 0, currentUser.totalStreams || 0),
+          streamingHours: Math.max(user.streamingHours || 0, currentUser.streamingHours || 0)
+        };
+      }
+    } catch (error) {
+      console.error('Error reading localStorage:', error);
+    }
+    return user;
+  };
+
+  const currentUserData = getCurrentUserData();
+  const progressPercentage = (currentUserData.points / currentUserData.pointsToNextLevel) * 100;
+  const displayLevel = currentUserData.level;
 
   return (
     <div className="main-content">
@@ -41,7 +92,7 @@ const Profile = () => {
                 <p className="profile-email">{user.email}</p>
                 <div className="profile-gems">
                   <span className="gems-icon">💎</span>
-                  <span className="gems-count">{user.gems.toLocaleString()}</span>
+                  <span className="gems-count">{currentUserData.gems.toLocaleString()}</span>
                   <span className="gems-label">Gemas</span>
                 </div>
               </div>
@@ -62,7 +113,7 @@ const Profile = () => {
                       ></div>
                     </div>
                     <div className="progress-text">
-                      {user.points} / {user.pointsToNextLevel} puntos
+                      {currentUserData.points} / {currentUserData.pointsToNextLevel} puntos
                     </div>
                   </div>
                 </div>
@@ -73,11 +124,11 @@ const Profile = () => {
               <h3>Estadísticas</h3>
               <div className="stats-grid">
                 <div className="stat-item">
-                  <div className="stat-value">{localStreams}</div>
+                  <div className="stat-value">{currentUserData.totalStreams}</div>
                   <div className="stat-label">Streams Realizados</div>
                 </div>
                 <div className="stat-item">
-                  <div className="stat-value">{localHours}h</div>
+                  <div className="stat-value">{currentUserData.streamingHours}h</div>
                   <div className="stat-label">Horas Transmitidas</div>
                 </div>
                 <div className="stat-item">
@@ -85,7 +136,7 @@ const Profile = () => {
                   <div className="stat-label">Nivel Actual</div>
                 </div>
                 <div className="stat-item">
-                  <div className="stat-value">{user.gems.toLocaleString()}</div>
+                  <div className="stat-value">{currentUserData.gems.toLocaleString()}</div>
                   <div className="stat-label">Gemas Totales</div>
                 </div>
               </div>

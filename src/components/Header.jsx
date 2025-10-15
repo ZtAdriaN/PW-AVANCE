@@ -54,11 +54,6 @@ const Header = () => {
                 {user.gems?.toLocaleString() || 0}
               </span>
             </div>
-            {user.role === "user" && (
-              <Link to="/RegalosSubs" className="nav-item">
-                Regalos para Seguidores
-              </Link>
-            )}
             <img
               src={user.profilePicture}
               alt={user.username}

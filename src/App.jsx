@@ -11,6 +11,7 @@ import Users from "./pages/Users";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import StreamView from "./pages/StreamView";
+import StreamOverlay from "./pages/StreamOverlay";
 import Categorias from "./pages/Categorias";
 import "./App.css";
 import PaymentMethods from "./pages/PaymentMethods";
@@ -36,6 +37,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/stream/:id" element={<StreamView />} />
+            <Route path="/stream-overlay" element={<StreamOverlay />} />
             <Route path="/categorias" element={<Categorias />} />
             <Route path="/payment" element={<PaymentMethods />} />
             <Route path="/coins" element={<VVCoins />} />

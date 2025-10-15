@@ -1,9 +1,17 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import StreamConfigModal from "../components/StreamConfigModal";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [streamConfig, setStreamConfig] = useState(() => {
+    // Cargar configuración guardada al inicializar
+    const savedConfig = localStorage.getItem('streamConfig');
+    return savedConfig ? JSON.parse(savedConfig) : null;
+  });
 
   if (!user) {
     return (
@@ -25,6 +33,36 @@ const Dashboard = () => {
     user.totalStreams > 0
       ? (user.streamingHours / user.totalStreams).toFixed(1)
       : 0;
+
+  // Funciones para manejar el stream
+  const [isStartingStream, setIsStartingStream] = useState(false);
+
+  const handleStartStream = () => {
+    if (streamConfig) {
+      // Si ya hay configuración, ir directamente al overlay
+      navigate('/stream-overlay', { state: streamConfig });
+    } else {
+      // Si no hay configuración, abrir modal primero
+      setIsStartingStream(true);
+      setIsConfigModalOpen(true);
+    }
+  };
+
+  const handleConfigureStream = () => {
+    setIsStartingStream(false);
+    setIsConfigModalOpen(true);
+  };
+
+  const handleSaveConfig = (config, shouldStartStream = false) => {
+    setStreamConfig(config);
+    // Opcional: guardar en localStorage o enviar al servidor
+    localStorage.setItem('streamConfig', JSON.stringify(config));
+    
+    // Si viene del botón "Iniciar Stream", redirigir automáticamente
+    if (shouldStartStream) {
+      navigate('/stream-overlay', { state: config });
+    }
+  };
 
   return (
     <div className="main-content">
@@ -126,22 +164,41 @@ const Dashboard = () => {
               </div>
             </div>
 
+            {user.role === "streamer" && streamConfig && (
+              <div className="dashboard-section">
+                <h3>Configuración de Stream Actual</h3>
+                <div className="stream-config-preview">
+                  <div className="config-item">
+                    <strong>Título:</strong> {streamConfig.title}
+                  </div>
+                  <div className="config-item">
+                    <strong>Categoría:</strong> {streamConfig.category}
+                  </div>
+                  <div className="config-item">
+                    <strong>Calidad:</strong> {streamConfig.quality} - {streamConfig.bitrate} kbps
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="dashboard-section">
               <h3>Acciones Rápidas</h3>
               <div className="quick-actions">
                 {user.role === "streamer" ? (
                   <>
-                    <button className="action-button primary">
+                    <button 
+                      className="action-button primary"
+                      onClick={handleStartStream}
+                    >
                       <span className="action-icon">🎥</span>
-                      Iniciar Stream
+                      {streamConfig ? 'Iniciar Stream' : 'Configurar e Iniciar'}
                     </button>
-                    <button className="action-button secondary">
+                    <button 
+                      className="action-button secondary"
+                      onClick={handleConfigureStream}
+                    >
                       <span className="action-icon">⚙️</span>
-                      Configurar Stream
-                    </button>
-                    <button className="action-button quaternary">
-                      <span className="action-icon">📊</span>
-                      Estadísticas Avanzadas
+                      {streamConfig ? 'Editar Configuración' : 'Configurar Stream'}
                     </button>
                     <Link to="/mi-tienda" className="action-button">
                       <span className="action-icon">🛒</span>
@@ -175,6 +232,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Configuración */}
+      <StreamConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => {
+          setIsConfigModalOpen(false);
+          setIsStartingStream(false);
+        }}
+        onSave={handleSaveConfig}
+        startStreamAfterSave={isStartingStream}
+      />
     </div>
   );
 };

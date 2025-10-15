@@ -1331,6 +1331,29 @@ button {
   font-size: 18px;
 }
 
+/* Stream Config Preview */
+.stream-config-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: rgba(145, 70, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(145, 70, 255, 0.2);
+}
+
+.config-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.config-item strong {
+  color: var(--twitch-purple);
+  min-width: 80px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-header {
@@ -2422,5 +2445,33 @@ button {
 .search-result-item:hover {
   background-color: #6b5dfc;
   color: #fff;
+}
+
+/* Stream Configuration Preview Styles */
+.stream-config-preview {
+  background: rgba(123, 44, 191, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  border-left: 4px solid var(--twitch-purple);
+}
+
+.config-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.config-item:last-child {
+  margin-bottom: 0;
+}
+
+.config-item strong {
+  color: var(--twitch-purple);
+  min-width: 80px;
+}
+
+.config-item {
+  color: var(--twitch-text);
 }
 

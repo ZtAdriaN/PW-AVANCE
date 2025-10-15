@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -12,14 +12,19 @@ const Dashboard = () => {
           <div className="page-content">
             <h1 className="page-title">Dashboard</h1>
             <p>Debes iniciar sesión para ver tu dashboard.</p>
-            <Link to="/login" className="back-button">Iniciar Sesión</Link>
+            <Link to="/login" className="back-button">
+              Iniciar Sesión
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  const averageStreamDuration = user.totalStreams > 0 ? (user.streamingHours / user.totalStreams).toFixed(1) : 0;
+  const averageStreamDuration =
+    user.totalStreams > 0
+      ? (user.streamingHours / user.totalStreams).toFixed(1)
+      : 0;
 
   return (
     <div className="main-content">
@@ -30,17 +35,20 @@ const Dashboard = () => {
           <div className="dashboard-container">
             <div className="dashboard-header">
               <div className="user-summary">
-                <img src={user.profilePicture} alt={user.username} className="dashboard-avatar" />
+                <img
+                  src={user.profilePicture}
+                  alt={user.username}
+                  className="dashboard-avatar"
+                />
                 <div>
                   <h2>¡Hola, {user.username}!</h2>
                   <p>
-                    {user.role === 'streamer' 
-                      ? 'Aquí tienes un resumen de tu actividad de streaming' 
-                      : 'Aquí tienes un resumen de tu actividad en la plataforma'
-                    }
+                    {user.role === "streamer"
+                      ? "Aquí tienes un resumen de tu actividad de streaming"
+                      : "Aquí tienes un resumen de tu actividad en la plataforma"}
                   </p>
                   <span className="user-role-badge">
-                    {user.role === 'streamer' ? '🎥 Streamer' : '👤 Usuario'}
+                    {user.role === "streamer" ? "🎥 Streamer" : "👤 Usuario"}
                   </span>
                 </div>
               </div>
@@ -77,7 +85,9 @@ const Dashboard = () => {
               <div className="stat-card quaternary">
                 <div className="stat-icon">💎</div>
                 <div className="stat-content">
-                  <div className="stat-number">{user.gems.toLocaleString()}</div>
+                  <div className="stat-number">
+                    {user.gems.toLocaleString()}
+                  </div>
                   <div className="stat-title">Gemas</div>
                   <div className="stat-subtitle">disponibles</div>
                 </div>
@@ -88,10 +98,15 @@ const Dashboard = () => {
               <h3>Progreso del Mes</h3>
               <div className="progress-summary">
                 <div className="progress-item">
-                  <span className="progress-label">Meta de horas mensuales:</span>
+                  <span className="progress-label">
+                    Meta de horas mensuales:
+                  </span>
                   <div className="progress-bar-container">
                     <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: '60%' }}></div>
+                      <div
+                        className="progress-fill"
+                        style={{ width: "60%" }}
+                      ></div>
                     </div>
                     <span className="progress-percentage">60%</span>
                   </div>
@@ -100,7 +115,10 @@ const Dashboard = () => {
                   <span className="progress-label">Streams este mes:</span>
                   <div className="progress-bar-container">
                     <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: '40%' }}></div>
+                      <div
+                        className="progress-fill"
+                        style={{ width: "40%" }}
+                      ></div>
                     </div>
                     <span className="progress-percentage">40%</span>
                   </div>
@@ -111,7 +129,7 @@ const Dashboard = () => {
             <div className="dashboard-section">
               <h3>Acciones Rápidas</h3>
               <div className="quick-actions">
-                {user.role === 'streamer' ? (
+                {user.role === "streamer" ? (
                   <>
                     <button className="action-button primary">
                       <span className="action-icon">🎥</span>
@@ -125,6 +143,10 @@ const Dashboard = () => {
                       <span className="action-icon">📊</span>
                       Estadísticas Avanzadas
                     </button>
+                    <Link to="/mi-tienda" className="action-button">
+                      <span className="action-icon">🛒</span>
+                      Mi Tienda
+                    </Link>
                   </>
                 ) : (
                   <>

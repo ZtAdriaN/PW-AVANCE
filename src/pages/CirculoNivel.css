@@ -1,0 +1,13 @@
+.user-level-circle {
+  display: inline-flex;          /* para centrar el número */
+  align-items: center;
+  justify-content: center;
+  width: 20px;                   /* tamaño del círculo */
+  height: 20px;
+  border-radius: 50%;
+  background-color: gray;         /* color por defecto */
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 5px;
+}

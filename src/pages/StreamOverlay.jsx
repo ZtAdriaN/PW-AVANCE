@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import DonationPanel from "../components/DonationPanel";
 import DonationHistory from "../components/DonationHistory";
+import AnimationOverlay from "../components/AnimationOverlay2";
 import "./StreamOverlay.css";
 import LevelUpToast from "../components/LevelUpToast";
 
@@ -10,6 +11,10 @@ const StreamOverlay = () => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  
+
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [lastDonation, setLastDonation] = useState(null);
   
   // Datos del stream de la configuración
   const streamConfig = location.state || {
@@ -153,15 +158,15 @@ const StreamOverlay = () => {
   };
 
   // Enviar mensaje al chat
-    // Recompensas de la tienda del streamer
-    const [storeItems, setStoreItems] = useState([]);
+  const [storeItems, setStoreItems] = useState([]);
 
-    useEffect(() => {
-      if (user?.id) {
-        const stored = localStorage.getItem(`store_${user.id}`);
-        setStoreItems(stored ? JSON.parse(stored) : []);
-      }
-    }, [user?.id]);
+  useEffect(() => {
+    if (user?.id) {
+      const stored = localStorage.getItem(`store_${user.id}`);
+      setStoreItems(stored ? JSON.parse(stored) : []);
+    }
+  }, [user?.id]);
+
   const handleChatSubmit = (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
@@ -177,7 +182,7 @@ const StreamOverlay = () => {
     setNewMessage('');
   };
 
-  // Manejar donación
+
   const handleDonation = (amount, message, isAnonymous) => {
     if (!user) return;
 
@@ -192,7 +197,16 @@ const StreamOverlay = () => {
 
     setDonations(prev => [newDonation, ...prev]);
 
-    // Agregar mensaje al chat
+    
+    setShowAnimation(true);
+    setLastDonation(newDonation);
+    
+    // Ocultar animación después de 3 segundos
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 3000);
+
+    // Siempre agregar mensaje al chat
     const chatMessage = {
       id: Date.now() + 1,
       user: 'Sistema',
@@ -316,23 +330,24 @@ const StreamOverlay = () => {
                 streamerName={user.username || 'Streamer'}
               />
             )}
-              {/* Recompensas de Mi Tienda */}
-              <div className="store-items-overlay">
-                <h3 className="store-overlay-title">🎁 Recompensas del Streamer</h3>
-                {storeItems.length === 0 ? (
-                  <p className="store-empty">No hay recompensas disponibles</p>
-                ) : (
-                  <div className="store-items-list">
-                    {storeItems.map(item => (
-                      <div key={item.id} className="store-item-card-overlay">
-                        <h4>{item.name}</h4>
-                        <p>💰 {item.price} coins</p>
-                        <p>⭐ {item.points} pts</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              
+            {/* Recompensas de Mi Tienda */}
+            <div className="store-items-overlay">
+              <h3 className="store-overlay-title">🎁 Recompensas del Streamer</h3>
+              {storeItems.length === 0 ? (
+                <p className="store-empty">No hay recompensas disponibles</p>
+              ) : (
+                <div className="store-items-list">
+                  {storeItems.map(item => (
+                    <div key={item.id} className="store-item-card-overlay">
+                      <h4>{item.name}</h4>
+                      <p>💰 {item.price} coins</p>
+                      <p>⭐ {item.points} pts</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -345,6 +360,11 @@ const StreamOverlay = () => {
             Volver al Dashboard
           </button>
         </div>
+
+      
+        {showAnimation && lastDonation && (
+          <AnimationOverlay donation={lastDonation} />
+        )}
       </div>
     </div>
   );

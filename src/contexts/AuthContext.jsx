@@ -28,6 +28,42 @@ export const AuthProvider = ({ children }) => {
     console.log(`Donaste ${amount} gemas a ${message || 'sin mensaje'}!`);
   };
 
+  const [levelUpInfo, setLevelUpInfo] = useState(null);
+
+  const addPoints = (pointsEarned, source = 'action') => {
+    setUser(prev => {
+      if (!prev) return prev;
+
+      let newPoints = (prev.points || 0) + (pointsEarned || 0);
+      let newLevel = prev.level || 1;
+      let pointsToNext = prev.pointsToNextLevel || 100;
+      let leveledUp = false;
+
+      while (newPoints >= pointsToNext) {
+        newPoints -= pointsToNext;
+        newLevel += 1;
+        pointsToNext = Math.max(50, Math.round(pointsToNext * 1.2));
+        leveledUp = true;
+      }
+
+      const updated = {
+        ...prev,
+        points: newPoints,
+        level: newLevel,
+        pointsToNextLevel: pointsToNext
+      };
+
+      if (leveledUp) {
+        setLevelUpInfo({ level: newLevel, timestamp: Date.now(), source });
+      }
+
+      localStorage.setItem('currentUser', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const clearLevelUpInfo = () => setLevelUpInfo(null);
+
   const [loading, setLoading] = useState(true);
 
   const getRegisteredUsers = () => {
@@ -164,10 +200,13 @@ export const AuthProvider = ({ children }) => {
     user,
     setUser,
     handleDonate,
+    addPoints,
     login,
     register,
     logout,
-    loading
+    loading,
+    levelUpInfo,
+    clearLevelUpInfo
   };
 
   return (

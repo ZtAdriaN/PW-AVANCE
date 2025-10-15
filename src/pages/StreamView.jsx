@@ -7,7 +7,7 @@ import DonationHistory from '../components/DonationHistory';
 
 const StreamView = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, addPoints } = useAuth();
   const [stream, setStream] = useState(null);
   const [donations, setDonations] = useState([]);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -164,6 +164,15 @@ const StreamView = () => {
     setLastDonation(newDonation);
     setShowAnimation(true);
 
+    try {
+      const pointsEarned = Math.floor(amount / 5);
+      if (pointsEarned > 0) {
+        addPoints(pointsEarned, 'donation');
+      }
+    } catch (e) {
+      console.error('Error al asignar puntos por donación:', e);
+    }
+
     // Agregar mensaje al chat
     const chatMessage = {
       id: chatMessages.length + 1,
@@ -191,6 +200,12 @@ const StreamView = () => {
 
     setChatMessages(prev => [...prev, message]);
     setNewMessage('');
+
+    try {
+      addPoints(1, 'message');
+    } catch (e) {
+      console.error('Error al asignar exp por mensaje:', e);
+    }
   };
 
   if (!stream) {

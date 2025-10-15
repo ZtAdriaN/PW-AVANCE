@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
+import LevelUpPopup from './components/LevelUpPopup';
 import Home from './pages/Home';
 import About from './pages/About';
 import Terms from './pages/Terms';
@@ -23,6 +24,7 @@ function App() {
       <Router>
         <div className="container">
           <Header />
+          <LevelUpPopup />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />

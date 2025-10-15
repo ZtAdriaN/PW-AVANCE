@@ -36,7 +36,9 @@ const RegalosSubs = () => {
 
   return (
     <div className="regalos-container">
-      <h1 className="regalos-title" style={{ textAlign: 'center' }}>Regalos para seguidores 🎁</h1>
+      <h1 className="regalos-title" style={{ textAlign: "center" }}>
+        Regalos para seguidores 🎁
+      </h1>
       <div className="regalos-grid">
         {streamers.map((streamer) => (
           <div className="regalos-card" key={streamer.nombre}>

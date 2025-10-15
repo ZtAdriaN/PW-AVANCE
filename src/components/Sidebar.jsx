@@ -18,12 +18,12 @@ const Sidebar = () => {
     {
       id: 2,
       name: "microbusero",
-      category: "PEAK",
+      category: "Roblox",
       viewers: 71,
       avatar:
         "https://cdna.artstation.com/p/assets/images/images/038/833/284/large/heleca-twitch-avatar-sasori-3.jpg?1624208447",
       categoryImage:
-        "https://static-cdn.jtvnw.net/ttv-boxart/1081998272_IGDB-285x380.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhIVuSJziidbwbT6F72af4fmlxRgn0DRX58Q&s",
     },
     {
       id: 3,
@@ -51,7 +51,7 @@ const Sidebar = () => {
       name: "peoplelite",
       category: "Just Chatting",
       viewers: 38,
-      avatar: "https://n9.cl/onkymf",
+      avatar: "https://instasize.com/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fmunkee%2Fimage%2Fupload%2Fw_1000%2Cc_fill%2Car_1%3A1%2Cg_auto%2Cr_max%2Fv1684339020%2Finstasize-website%2Flearn%2Fman-streaming-white-headphones.webp&w=828&q=75",
       categoryImage:
         "https://static-cdn.jtvnw.net/ttv-boxart/509658-188x250.jpg",
     },

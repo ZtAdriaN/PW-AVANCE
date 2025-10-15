@@ -74,28 +74,28 @@ const About = () => {
 
               <div className="team-member">
                 <div className="team-photo">
-                  <img src="/path/to/member3.jpg" alt="Dante Chávez" />
+                  <img src="../images/dante.png" alt="Dante Chávez" />
                 </div>
                 <h3>Dante Chávez</h3>
               </div>
 
               <div className="team-member">
                 <div className="team-photo">
-                  <img src="/path/to/member4.jpg" alt="Sherlock Castañeda" />
+                  <img src="../images/sherlock.jpg" alt="Sherlock Castañeda" />
                 </div>
                 <h3>Sherlock Castañeda</h3>
               </div>
 
               <div className="team-member">
                 <div className="team-photo">
-                  <img src="/path/to/member5.jpg" alt="Gabriel Gutiérrez" />
+                  <img src="../images/gabriel.jpg" alt="Gabriel Gutiérrez" />
                 </div>
                 <h3>Gabriel Gutiérrez</h3>
               </div>
 
               <div className="team-member">
                 <div className="team-photo">
-                  <img src="/path/to/member6.jpg" alt="Mateo Ortega" />
+                  <img src="../images/mateo.jpg" alt="Mateo Ortega" />
                 </div>
                 <h3>Mateo Ortega</h3>
               </div>

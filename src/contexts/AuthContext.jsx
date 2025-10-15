@@ -14,7 +14,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = JSON.parse(localStorage.getItem("currentUser")) || null;
     return storedUser
-      ? { ...storedUser, points: storedUser.points ?? 0 }
+      ? {
+          ...storedUser,
+          points: storedUser.points ?? 0,
+          pointsToNextLevel: storedUser.pointsToNextLevel ?? 100,
+          level: storedUser.level ?? 1,
+        }
       : null;
   });
 

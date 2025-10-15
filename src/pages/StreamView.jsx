@@ -5,7 +5,7 @@ import DonationPanel from '../components/DonationPanel';
 import AnimationOverlay from '../components/AnimationOverlay';
 import DonationHistory from '../components/DonationHistory';
 import LevelUpToast from '../components/LevelUpToast';
-
+import './CirculoNivel.css';
 const StreamView = () => {
   const { id } = useParams();
   const { user, setUser } = useAuth();
@@ -17,7 +17,19 @@ const StreamView = () => {
   const [newMessage, setNewMessage] = useState('');
   const [levelUpInfo, setLevelUpInfo] = useState(null); // { level }
   const prevLevelRef = useRef(user?.level ?? 1);
-
+const getColorForLevel = (nivel) => {
+  const level = nivel || 1;
+  
+  if (level >= 1 && level <= 3) {
+    return 'gray';
+  } else if (level >= 4 && level <= 8) {
+    return 'green'; 
+  } else if (level >= 9) {
+    return 'purple'; 
+  } else {
+    return 'white'; 
+  }
+};
   // Datos de ejemplo para el stream
   useEffect(() => {
     const streamsData = {
@@ -89,40 +101,40 @@ const StreamView = () => {
     // Mensajes de chat personalizados por stream
     const chatMessagesData = {
       1: [ // peoplelite 
-        { id: 1, user: 'FortniteKing', message: '¡Vamos por la Victory Royale!', timestamp: Date.now() - 45000 },
-        { id: 2, user: 'BuildMaster', message: 'Esa construcción estuvo épica 🔥', timestamp: Date.now() - 30000 },
-        { id: 3, user: 'ChatFan', message: 'Reto: solo usar escopeta esta partida', timestamp: Date.now() - 20000 },
-        { id: 4, user: 'PeopleFan1', message: 'peoplelite el mejor streamer!', timestamp: Date.now() - 15000 },
+        { id: 1, user: 'FortniteKing', message: '¡Vamos por la Victory Royale!', timestamp: Date.now() - 45000 , nivel: Math.floor(Math.random() * 10) + 1},
+        { id: 2, user: 'BuildMaster', message: 'Esa construcción estuvo épica 🔥', timestamp: Date.now() - 30000 , nivel: Math.floor(Math.random() * 10) + 1},
+        { id: 3, user: 'ChatFan', message: 'Reto: solo usar escopeta esta partida', timestamp: Date.now() - 20000 , nivel: Math.floor(Math.random() * 10) + 1},
+        { id: 4, user: 'PeopleFan1', message: 'peoplelite el mejor streamer!', timestamp: Date.now() - 15000, nivel: Math.floor(Math.random() * 10) + 1 },
       ],
       2: [ // eldonstark82 
-        { id: 1, user: 'ValorantPro', message: 'Ace incoming!', timestamp: Date.now() - 40000 },
-        { id: 2, user: 'TacticalViewer', message: 'Usa el smoke ahí', timestamp: Date.now() - 35000 },
-        { id: 3, user: 'RankedGamer', message: '¿En qué rank estás?', timestamp: Date.now() - 25000 },
-        { id: 4, user: 'StarkFan', message: 'Don Stark nunca falla', timestamp: Date.now() - 18000 },
+        { id: 1, user: 'ValorantPro', message: 'Ace incoming!', timestamp: Date.now() - 40000,nivel: 3 },
+        { id: 2, user: 'TacticalViewer', message: 'Usa el smoke ahí', timestamp: Date.now() - 35000 , nivel: 1},
+        { id: 3, user: 'RankedGamer', message: '¿En qué rank estás?', timestamp: Date.now() - 25000 , nivel: 2},
+        { id: 4, user: 'StarkFan', message: 'Don Stark nunca falla', timestamp: Date.now() - 18000 , nivel: 3},
       ],
       3: [ // bububuenas 
         { id: 1, user: 'ChatLover', message: 'Buenas bubu! ¿Cómo estás?', timestamp: Date.now() - 50000 },
-        { id: 2, user: 'CommunityMember', message: 'Cuenta alguna anécdota divertida', timestamp: Date.now() - 35000 },
-        { id: 3, user: 'RegularViewer', message: '¿Ya decidiste sobre la nueva intro?', timestamp: Date.now() - 22000 },
-        { id: 4, user: 'ChillVibes', message: 'Este stream es súper relajante', timestamp: Date.now() - 12000 },
+        { id: 2, user: 'CommunityMember', message: 'Cuenta alguna anécdota divertida', timestamp: Date.now() - 35000 , nivel: 3},
+        { id: 3, user: 'RegularViewer', message: '¿Ya decidiste sobre la nueva intro?', timestamp: Date.now() - 22000 , nivel: 2},
+        { id: 4, user: 'ChillVibes', message: 'Este stream es súper relajante', timestamp: Date.now() - 12000 , nivel: 1},
       ],
       4: [ // microbusero 
-        { id: 1, user: 'MicrobusLover', message: 'JAJAJA el sueño microbusero', timestamp: Date.now() - 42000 },
-        { id: 2, user: 'RobloxFan', message: 'Ese juego de Roblox está buenísimo', timestamp: Date.now() - 28000 },
-        { id: 3, user: 'TransporteFan', message: '¿Ya manejaste microbús real?', timestamp: Date.now() - 20000 },
-        { id: 4, user: 'ComedyViewer', message: 'Tus historias me matan de risa 😂', timestamp: Date.now() - 16000 },
+        { id: 1, user: 'MicrobusLover', message: 'JAJAJA el sueño microbusero', timestamp: Date.now() - 42000 , nivel: 1},
+        { id: 2, user: 'RobloxFan', message: 'Ese juego de Roblox está buenísimo', timestamp: Date.now() - 28000 , nivel: 2},
+        { id: 3, user: 'TransporteFan', message: '¿Ya manejaste microbús real?', timestamp: Date.now() - 20000 , nivel: 2},
+        { id: 4, user: 'ComedyViewer', message: 'Tus historias me matan de risa 😂', timestamp: Date.now() - 16000 , nivel: 3},
       ],
       5: [ // nezumivy 
-        { id: 1, user: 'HorrorFan', message: 'DROPS ON! Gracias nezu!', timestamp: Date.now() - 38000 },
-        { id: 2, user: 'ScaredViewer', message: 'No mires atrás... 👻', timestamp: Date.now() - 32000 },
-        { id: 3, user: 'BroGamer', message: 'Playing with the bros! 🎮', timestamp: Date.now() - 24000 },
-        { id: 4, user: 'JumpscareVictim', message: 'Casi me da un infarto con ese susto', timestamp: Date.now() - 14000 },
+        { id: 1, user: 'HorrorFan', message: 'DROPS ON! Gracias nezu!', timestamp: Date.now() - 38000 , nivel: 2},
+        { id: 2, user: 'ScaredViewer', message: 'No mires atrás... 👻', timestamp: Date.now() - 32000 , nivel: 1},
+        { id: 3, user: 'BroGamer', message: 'Playing with the bros! 🎮', timestamp: Date.now() - 24000 , nivel: 1},
+        { id: 4, user: 'JumpscareVictim', message: 'Casi me da un infarto con ese susto', timestamp: Date.now() - 14000 , nivel: 3},
       ],
       6: [ // gamer_pro 
-        { id: 1, user: 'BertieFan', message: 'Por Diego Bertie! ⭐', timestamp: Date.now() - 44000 },
-        { id: 2, user: 'ChallengeFan', message: 'xd', timestamp: Date.now() - 30000 },
-        { id: 3, user: 'ProGamer', message: 'Gamer_pro siempre dando lo mejor', timestamp: Date.now() - 26000 },
-        { id: 4, user: 'MemorialViewer', message: 'Alalau! ere frio mano', timestamp: Date.now() - 18000 },
+        { id: 1, user: 'BertieFan', message: 'Por Diego Bertie! ⭐', timestamp: Date.now() - 44000 , nivel: 1},
+        { id: 2, user: 'ChallengeFan', message: 'xd', timestamp: Date.now() - 30000 , nivel: 1},
+        { id: 3, user: 'ProGamer', message: 'Gamer_pro siempre dando lo mejor', timestamp: Date.now() - 26000 , nivel: 3},
+        { id: 4, user: 'MemorialViewer', message: 'Alalau! ere frio mano', timestamp: Date.now() - 18000 , nivel: 3},
       ]
     };
 
@@ -273,7 +285,8 @@ const StreamView = () => {
       id: chatMessages.length + 1,
       user: user.username,
       message: newMessage,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      nivel: user.level
     };
 
     setChatMessages(prev => [...prev, message]);
@@ -331,7 +344,13 @@ const StreamView = () => {
               <div className="chat-messages">
                 {chatMessages.map(msg => (
                   <div key={msg.id} className={`chat-message ${msg.isSystem ? 'system-message' : ''}`}>
-                    <span className="chat-user">{msg.user}:</span>
+                    <span className="chat-user">
+                {msg.user !== 'Sistema' && (<span 
+      className="user-level-circle"
+      style={{ backgroundColor: getColorForLevel(msg.nivel) }}
+      title={`Nivel ${msg.nivel}`}
+    >{msg.nivel}</span>)}{msg.user}:
+</span>
                     <span className="chat-text">{msg.message}</span>
                   </div>
                 ))}

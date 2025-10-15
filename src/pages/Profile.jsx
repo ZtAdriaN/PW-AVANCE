@@ -4,6 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Profile = () => {
   const { user } = useAuth();
+  // Leer nivel desde localStorage si existe
+  const [localLevel, setLocalLevel] = React.useState(null);
+
+  React.useEffect(() => {
+    if (user?.id) {
+      const storedLevel = localStorage.getItem(`level_${user.id}`);
+      if (storedLevel !== null) {
+        setLocalLevel(Number(storedLevel));
+      }
+    }
+  }, [user?.id]);
 
   if (!user) {
     return (
@@ -20,6 +31,8 @@ const Profile = () => {
   }
 
   const progressPercentage = (user.points / user.pointsToNextLevel) * 100;
+  // Usar el nivel de localStorage si existe
+  const displayLevel = localLevel !== null ? localLevel : user.level;
 
   return (
     <div className="main-content">
@@ -48,7 +61,7 @@ const Profile = () => {
               <div className="level-container">
                 <div className="level-info">
                   <div className="current-level">
-                    <span className="level-number">Nivel {user.level}</span>
+                    <span className="level-number">Nivel {displayLevel}</span>
                   </div>
                   <div className="level-progress">
                     <div className="progress-bar">
@@ -77,7 +90,7 @@ const Profile = () => {
                   <div className="stat-label">Horas Transmitidas</div>
                 </div>
                 <div className="stat-item">
-                  <div className="stat-value">{user.level}</div>
+                  <div className="stat-value">{displayLevel}</div>
                   <div className="stat-label">Nivel Actual</div>
                 </div>
                 <div className="stat-item">

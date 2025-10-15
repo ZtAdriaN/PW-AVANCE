@@ -45,6 +45,22 @@ const Dashboard = () => {
     );
   }
 
+  if (user.role !== 'streamer') {
+    return (
+      <div className="main-content">
+        <div className="content">
+          <div className="page-content">
+            <h1 className="page-title">Dashboard</h1>
+            <p>Solo los streamers pueden acceder al dashboard.</p><br />
+            <Link to="/" className="back-button">
+              Volver al inicio
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const totalStreams = localStreams !== null ? localStreams : user.totalStreams;
   const streamingHours = localHours !== null ? localHours : user.streamingHours;
   const averageStreamDuration = totalStreams > 0 ? (streamingHours / totalStreams).toFixed(1) : 0;

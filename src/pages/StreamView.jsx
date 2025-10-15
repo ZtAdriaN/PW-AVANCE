@@ -8,7 +8,7 @@ import LevelUpToast from '../components/LevelUpToast';
 import './CirculoNivel.css';
 const StreamView = () => {
   const { id } = useParams();
-  const { user, setUser } = useAuth();
+  const { user, setUser, addPointsAndLevelUp } = useAuth();
   const [stream, setStream] = useState(null);
   const [donations, setDonations] = useState([]);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -281,33 +281,20 @@ const getColorForLevel = (nivel) => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
-        let currentLevel = 1;
-        try {
-          const storedLevel = localStorage.getItem(`level_${user.id}`);
-          if (storedLevel !== null) {
-            currentLevel = Number(storedLevel);
-          } else if (typeof user.level === 'number') {
-            currentLevel = user.level;
-          }
-        } catch {
-          if (typeof user.level === 'number') {
-            currentLevel = user.level;
-          }
-        }
-        
-        const message = {
-          id: chatMessages.length + 1,
-          user: user.username,
-          message: newMessage,
-          timestamp: Date.now(),
-          nivel: currentLevel
-        };
+    let currentLevel = user.level ?? 1;
+    const message = {
+      id: chatMessages.length + 1,
+      user: user.username,
+      message: newMessage,
+      timestamp: Date.now(),
+      nivel: currentLevel
+    };
 
     setChatMessages(prev => [...prev, message]);
     setNewMessage('');
 
-    // Otorgar 1 XP por mensaje enviado
-    awardXp(1);
+    // Sumar puntos y subir nivel usando la función global
+    addPointsAndLevelUp(1); // 1 punto por mensaje
   };
 
   if (!stream) {

@@ -47,44 +47,6 @@ const PublicProfile = () => {
           )}
         </div>
       </div>
-
-      <div className="profile-stats">
-        <div className="stat-card">
-          <div className="stat-value gems">
-            💎 {userProfile.gems || 0}
-          </div>
-          <div className="stat-label">Gemas</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-value level">
-            🏆 {userProfile.level || 1}
-          </div>
-          <div className="stat-label">Nivel</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-value points">
-            ⭐ {userProfile.points || 0}
-          </div>
-          <div className="stat-label">Puntos</div>
-        </div>
-      </div>
-
-      <div className="profile-streams">
-        <h2 className="streams-title">
-          📺 Streams pasados
-        </h2>
-        {userProfile.totalStreams > 0 ? (
-          <p className="streams-content">
-            Este usuario ha realizado {userProfile.totalStreams} streams.
-          </p>
-        ) : (
-          <p className="streams-content empty">
-            No hay streams aún.
-          </p>
-        )}
-      </div>
     </div>
   );
 };

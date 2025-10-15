@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import "./Tienda.css";
 
 const StreamerStore = () => {
   const { user } = useContext(AuthContext);
@@ -28,42 +29,56 @@ const StreamerStore = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Mi tienda (Streamer)</h1>
-      <div style={{ marginBottom: "20px" }}>
+    <div className="store-container">
+      <h1 className="store-title">Mi tienda (Streamer)</h1>
+
+      <div className="store-form">
         <input
           type="text"
           placeholder="Nombre del objeto"
           value={newItem.name}
           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+          className="store-input"
         />
         <input
           type="number"
           placeholder="Precio en monedas"
           value={newItem.price}
           onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+          className="store-input"
         />
         <input
           type="number"
           placeholder="Puntos que otorga"
           value={newItem.points}
           onChange={(e) => setNewItem({ ...newItem, points: e.target.value })}
+          className="store-input"
         />
-        <button onClick={handleAddItem}>Agregar</button>
+        <button onClick={handleAddItem} className="store-button">
+          Agregar
+        </button>
       </div>
 
-      <h2>Objetos en venta</h2>
+      <h2 className="store-subtitle">Objetos en venta</h2>
+
       {items.length === 0 ? (
-        <p>No hay productos aún</p>
+        <p className="store-empty">No hay productos aún</p>
       ) : (
-        <ul>
+        <div className="store-items">
           {items.map((item) => (
-            <li key={item.id}>
-              {item.name} - {item.price} coins - {item.points} pts
-              <button onClick={() => handleDelete(item.id)}>Eliminar</button>
-            </li>
+            <div key={item.id} className="store-item-card">
+              <h3>{item.name}</h3>
+              <p>💰 {item.price} coins</p>
+              <p>⭐ {item.points} pts</p>
+              <button
+                onClick={() => handleDelete(item.id)}
+                className="store-item-delete"
+              >
+                Eliminar
+              </button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

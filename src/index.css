@@ -2368,3 +2368,59 @@ button {
   color: var(--twitch-accent);
   margin-top: 0.3rem;
 }
+
+/* Contenedor de la barra */
+.header-center {
+  position: relative;
+  margin: 0 20px;
+  flex: 1; /* Ocupa espacio central */
+  display: flex;
+  justify-content: center;
+}
+
+/* Input de búsqueda */
+.search-input {
+  width: 100%;
+  max-width: 350px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+/* Efecto al hacer focus */
+.search-input:focus {
+  border-color: #6b5dfc; /* color destacado */
+  box-shadow: 0 0 8px rgba(107, 93, 252, 0.4);
+}
+
+/* Dropdown de resultados */
+.search-dropdown {
+  position: absolute;
+  top: 42px; /* justo debajo del input */
+  width: 100%;
+  max-width: 350px;
+  background-color: #1a1a1a; /* oscuro */
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 50;
+  overflow: hidden;
+}
+
+/* Cada item del dropdown */
+.search-result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #6b5dfc;
+  color: #fff;
+}
+

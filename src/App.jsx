@@ -18,6 +18,7 @@ import VVCoins from "./pages/VVCoins";
 import RegalosSubs from "./pages/RegalosSubs";
 import StreamerStore from "./pages/StreamerStore";
 import StoreView from "./pages/StoreView";
+import PublicProfile from "./pages/PublicProfile";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="/regalossubs" element={<RegalosSubs />} />
             <Route path="/mi-tienda" element={<StreamerStore />} />
             <Route path="/tienda/:streamerId" element={<StoreView />} />
+            <Route path="/user/:id" element={<PublicProfile />} />
           </Routes>
         </div>
       </Router>

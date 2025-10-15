@@ -87,7 +87,6 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      {/* ✅ Enlace solo visible para streamers */}
       {user?.role === "streamer" && (
         <div className="sidebar-section">
           <h3 className="sidebar-title">Mi Tienda</h3>

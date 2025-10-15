@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import "./Tienda.css";
 
 const StoreView = () => {
   const { streamerId } = useParams();
@@ -13,23 +14,31 @@ const StoreView = () => {
 
   const handleBuy = (item) => {
     alert(`Compraste: ${item.name} y ganaste ${item.points} puntos`);
-    // Aquí luego se integrará con puntos del usuario
+    // Aquí se integrará con el saldo del usuario
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Tienda del streamer</h1>
+    <div className="store-container">
+      <h1 className="store-title">Tienda del Streamer</h1>
+
       {items.length === 0 ? (
-        <p>Este streamer aún no tiene productos.</p>
+        <p className="store-empty">Este streamer aún no tiene productos.</p>
       ) : (
-        <ul>
+        <div className="store-items">
           {items.map((item) => (
-            <li key={item.id}>
-              {item.name} - {item.price} coins
-              <button onClick={() => handleBuy(item)}>Comprar</button>
-            </li>
+            <div key={item.id} className="store-item-card">
+              <h3>{item.name}</h3>
+              <p>💰 {item.price} coins</p>
+              <p>⭐ {item.points} pts</p>
+              <button
+                onClick={() => handleBuy(item)}
+                className="store-item-buy"
+              >
+                Comprar
+              </button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

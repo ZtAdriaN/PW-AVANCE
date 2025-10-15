@@ -22,6 +22,31 @@ const StreamerStore = () => {
     setNewItem({ name: "", price: "", points: "" });
   };
 
+
+  // Estado para edición
+  const [editId, setEditId] = useState(null);
+  const [editItem, setEditItem] = useState({ name: '', price: '', points: '' });
+
+  const handleEditClick = (item) => {
+    setEditId(item.id);
+    setEditItem({ name: item.name, price: item.price, points: item.points });
+  };
+
+  const handleEditSave = (id) => {
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, ...editItem } : item
+    );
+    setItems(updatedItems);
+    localStorage.setItem(`store_${user.id}`, JSON.stringify(updatedItems));
+    setEditId(null);
+    setEditItem({ name: '', price: '', points: '' });
+  };
+
+  const handleEditCancel = () => {
+    setEditId(null);
+    setEditItem({ name: '', price: '', points: '' });
+  };
+
   const handleDelete = (id) => {
     const updatedItems = items.filter((item) => item.id !== id);
     setItems(updatedItems);
@@ -67,15 +92,42 @@ const StreamerStore = () => {
         <div className="store-items">
           {items.map((item) => (
             <div key={item.id} className="store-item-card">
-              <h3>{item.name}</h3>
-              <p>💰 {item.price} coins</p>
-              <p>⭐ {item.points} pts</p>
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="store-item-delete"
-              >
-                Eliminar
-              </button>
+              {editId === item.id ? (
+                <>
+                  <input
+                    type="text"
+                    value={editItem.name}
+                    onChange={e => setEditItem({ ...editItem, name: e.target.value })}
+                    className="store-input"
+                  />
+                  <input
+                    type="number"
+                    value={editItem.price}
+                    onChange={e => setEditItem({ ...editItem, price: e.target.value })}
+                    className="store-input"
+                  />
+                  <input
+                    type="number"
+                    value={editItem.points}
+                    onChange={e => setEditItem({ ...editItem, points: e.target.value })}
+                    className="store-input"
+                  />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                    <button onClick={() => handleEditSave(item.id)} className="store-button">Guardar</button>
+                    <button onClick={handleEditCancel} className="store-item-delete">Cancelar</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3>{item.name}</h3>
+                  <p>💰 {item.price} coins</p>
+                  <p>⭐ {item.points} pts</p>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                    <button onClick={() => handleEditClick(item)} className="store-button">Editar</button>
+                    <button onClick={() => handleDelete(item.id)} className="store-item-delete">Eliminar</button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>

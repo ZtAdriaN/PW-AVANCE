@@ -1,3 +1,17 @@
+/* Acciones rápidas dashboard */
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.action-button.store {
+  background: #00d26a;
+  color: #fff;
+  font-weight: bold;
+}
 * {
   margin: 0;
   padding: 0;

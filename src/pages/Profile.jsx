@@ -4,14 +4,24 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Profile = () => {
   const { user } = useAuth();
-  // Leer nivel desde localStorage si existe
+  // Leer nivel, streams y horas desde localStorage si existen
   const [localLevel, setLocalLevel] = React.useState(null);
+  const [localStreams, setLocalStreams] = React.useState(null);
+  const [localHours, setLocalHours] = React.useState(null);
 
   React.useEffect(() => {
     if (user?.id) {
       const storedLevel = localStorage.getItem(`level_${user.id}`);
       if (storedLevel !== null) {
         setLocalLevel(Number(storedLevel));
+      }
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (currentUser) {
+        setLocalStreams(currentUser.totalStreams ?? user.totalStreams);
+        setLocalHours(currentUser.streamingHours ?? user.streamingHours);
+      } else {
+        setLocalStreams(user.totalStreams);
+        setLocalHours(user.streamingHours);
       }
     }
   }, [user?.id]);
@@ -82,11 +92,11 @@ const Profile = () => {
               <h3>Estadísticas</h3>
               <div className="stats-grid">
                 <div className="stat-item">
-                  <div className="stat-value">{user.totalStreams}</div>
+                  <div className="stat-value">{localStreams !== null ? localStreams : user.totalStreams}</div>
                   <div className="stat-label">Streams Realizados</div>
                 </div>
                 <div className="stat-item">
-                  <div className="stat-value">{user.streamingHours}h</div>
+                  <div className="stat-value">{localHours !== null ? localHours : user.streamingHours}h</div>
                   <div className="stat-label">Horas Transmitidas</div>
                 </div>
                 <div className="stat-item">

@@ -69,7 +69,23 @@ const StreamOverlay = () => {
 
       // Simulación: cada minuto real suma 1 hora simulada
       hourInterval = setInterval(() => {
-        setSimulatedHours(prev => prev + 1);
+          setSimulatedHours(prev => {
+            const newHours = prev + 1;
+            // Actualizar horas transmitidas en el usuario
+            if (user?.id) {
+              // Actualizar en contexto y localStorage
+              let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+              if (currentUser) {
+                currentUser.streamingHours = (currentUser.streamingHours || 0) + 1;
+                localStorage.setItem("currentUser", JSON.stringify(currentUser));
+              }
+              // Actualizar en registeredUsers
+              let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+              users = users.map(u => u.id === user.id ? { ...u, streamingHours: (u.streamingHours || 0) + 1 } : u);
+              localStorage.setItem("registeredUsers", JSON.stringify(users));
+            }
+            return newHours;
+          });
       }, 60000); // 60000 ms = 1 min real
 
       // Simular viewers fluctuando
@@ -127,6 +143,16 @@ const StreamOverlay = () => {
         if (storedLevel !== null) {
           startLevel = Number(storedLevel);
         }
+        // Incrementar streams realizados en contexto y localStorage
+        let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (currentUser) {
+          currentUser.totalStreams = (currentUser.totalStreams || 0) + 1;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        }
+        // Actualizar en registeredUsers
+        let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+        users = users.map(u => u.id === user.id ? { ...u, totalStreams: (u.totalStreams || 0) + 1 } : u);
+        localStorage.setItem("registeredUsers", JSON.stringify(users));
       }
       setSimulatedHours(startLevel);
       setLevel(startLevel);

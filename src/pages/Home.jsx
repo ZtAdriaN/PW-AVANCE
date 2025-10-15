@@ -36,7 +36,7 @@ const Home = () => {
       id: 4,
       title: "MI SUEÑO ES SER MICROBUSERO",
       streamer: "microbusero",
-      category: "PEAK",
+      category: "Roblox",
       viewers: 71,
       thumbnail: "../images/stream4.jpg",
       isLive: true,

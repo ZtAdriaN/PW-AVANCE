@@ -1,4 +1,4 @@
-                                import React, { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import StreamConfigModal from "../components/StreamConfigModal";
@@ -8,6 +8,7 @@ const Dashboard = () => {
   // Leer streams y horas desde localStorage si existen
   const [localStreams, setLocalStreams] = React.useState(null);
   const [localHours, setLocalHours] = React.useState(null);
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
     if (user?.id) {
@@ -20,7 +21,26 @@ const Dashboard = () => {
         setLocalHours(user.streamingHours);
       }
     }
-  }, [user?.id]);
+  }, [user?.id, refreshKey]);
+
+  // Verificar actualizaciones en localStorage cada segundo
+  React.useEffect(() => {
+    const checkForUpdates = () => {
+      if (user?.id) {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (currentUser && currentUser.id === user.id) {
+          // Si hay nuevos datos en localStorage, actualizar el estado
+          if (currentUser.totalStreams !== localStreams || 
+              currentUser.streamingHours !== localHours) {
+            setRefreshKey(prev => prev + 1);
+          }
+        }
+      }
+    };
+
+    const interval = setInterval(checkForUpdates, 1000); // Verificar cada segundo
+    return () => clearInterval(interval);
+  }, [user?.id, localStreams, localHours]);
   const navigate = useNavigate();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [streamConfig, setStreamConfig] = useState(() => {
@@ -61,8 +81,37 @@ const Dashboard = () => {
     );
   }
 
-  const totalStreams = localStreams !== null ? localStreams : user.totalStreams;
-  const streamingHours = localHours !== null ? localHours : user.streamingHours;
+  // Obtener los datos más actualizados (localStorage puede tener datos más recientes)
+  const getCurrentUserData = () => {
+    try {
+      const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+      const found = users.find(u => u.id === user.id);
+      if (found) {
+        return {
+          totalStreams: found.totalStreams || 0,
+          streamingHours: found.streamingHours || 0
+        };
+      }
+      // Fallback a currentUser si no está en registeredUsers
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (currentUser && currentUser.id === user.id) {
+        return {
+          totalStreams: currentUser.totalStreams || 0,
+          streamingHours: currentUser.streamingHours || 0
+        };
+      }
+    } catch (error) {
+      console.error('Error reading localStorage:', error);
+    }
+    return {
+      totalStreams: user.totalStreams || 0,
+      streamingHours: user.streamingHours || 0
+    };
+  };
+
+  const currentData = getCurrentUserData();
+  const totalStreams = currentData.totalStreams;
+  const streamingHours = currentData.streamingHours;
   const averageStreamDuration = totalStreams > 0 ? (streamingHours / totalStreams).toFixed(1) : 0;
 
   // Funciones para manejar el stream
@@ -155,7 +204,7 @@ const Dashboard = () => {
                 <div className="stat-icon">💎</div>
                 <div className="stat-content">
                   <div className="stat-number">
-                    {user.gems.toLocaleString()}
+                    {user.gems?.toLocaleString() || 0}
                   </div>
                   <div className="stat-title">Gemas</div>
                   <div className="stat-subtitle">disponibles</div>

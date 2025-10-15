@@ -67,7 +67,7 @@ const StreamOverlay = () => {
         setStreamDuration(prev => prev + 1);
       }, 1000);
 
-      // Simulación: cada minuto real suma 1 hora simulada
+      // Simulación: cada 10 segundos reales suma 1 hora simulada
       hourInterval = setInterval(() => {
           setSimulatedHours(prev => {
             const newHours = prev + 1;
@@ -75,9 +75,18 @@ const StreamOverlay = () => {
             if (user?.id) {
               // Actualizar en contexto y localStorage
               let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-              if (currentUser) {
+              if (currentUser && currentUser.id === user.id) {
                 currentUser.streamingHours = (currentUser.streamingHours || 0) + 1;
                 localStorage.setItem("currentUser", JSON.stringify(currentUser));
+              } else {
+                // Si no existe currentUser o no coincide el ID, conservar los contadores actuales si existen
+                const prevUser = JSON.parse(localStorage.getItem("currentUser"));
+                const newCurrentUser = {
+                  ...user,
+                  totalStreams: (prevUser && prevUser.totalStreams) ? prevUser.totalStreams : (user.totalStreams || 0),
+                  streamingHours: ((prevUser && prevUser.streamingHours) ? prevUser.streamingHours : (user.streamingHours || 0)) + 1
+                };
+                localStorage.setItem("currentUser", JSON.stringify(newCurrentUser));
               }
               // Actualizar en registeredUsers
               let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
@@ -86,7 +95,7 @@ const StreamOverlay = () => {
             }
             return newHours;
           });
-      }, 60000); // 60000 ms = 1 min real
+      }, 10000); // 10000 ms = 10 segundos reales
 
       // Simular viewers fluctuando
       viewerInterval = setInterval(() => {
@@ -133,7 +142,22 @@ const StreamOverlay = () => {
           currentUser.level = newLevel;
           currentUser.points = 0;
           currentUser.pointsToNextLevel = newPointsToNextLevel;
+          // Mantener los contadores existentes
+          currentUser.totalStreams = currentUser.totalStreams || 0;
+          currentUser.streamingHours = currentUser.streamingHours || 0;
           localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        } else {
+          // Si no existe, crear el objeto usando los contadores actuales de localStorage si existen
+          const prevUser = JSON.parse(localStorage.getItem("currentUser"));
+          const newCurrentUser = {
+            ...user,
+            level: newLevel,
+            points: 0,
+            pointsToNextLevel: newPointsToNextLevel,
+            totalStreams: (prevUser && prevUser.totalStreams) ? prevUser.totalStreams : (user.totalStreams || 0),
+            streamingHours: (prevUser && prevUser.streamingHours) ? prevUser.streamingHours : (user.streamingHours || 0)
+          };
+          localStorage.setItem("currentUser", JSON.stringify(newCurrentUser));
         }
         
         // Actualizar en registeredUsers también
@@ -178,9 +202,22 @@ const StreamOverlay = () => {
         }
         // Incrementar streams realizados en contexto y localStorage
         let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (currentUser) {
+        console.log("🎥 StreamOverlay - Starting stream, currentUser before:", currentUser);
+        
+        if (currentUser && currentUser.id === user.id) {
           currentUser.totalStreams = (currentUser.totalStreams || 0) + 1;
           localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          console.log("✅ StreamOverlay - Incremented totalStreams:", currentUser.totalStreams);
+        } else {
+          // Si no existe currentUser o no coincide el ID, conservar los contadores actuales si existen
+          const prevUser = JSON.parse(localStorage.getItem("currentUser"));
+          const newCurrentUser = {
+            ...user,
+            totalStreams: ((prevUser && prevUser.totalStreams) ? prevUser.totalStreams : (user.totalStreams || 0)) + 1,
+            streamingHours: (prevUser && prevUser.streamingHours) ? prevUser.streamingHours : (user.streamingHours || 0)
+          };
+          localStorage.setItem("currentUser", JSON.stringify(newCurrentUser));
+          console.log("✅ StreamOverlay - Created new currentUser:", newCurrentUser);
         }
         // Actualizar en registeredUsers
         let users = JSON.parse(localStorage.getItem("registeredUsers")) || [];

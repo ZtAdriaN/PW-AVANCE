@@ -1,1 +1,63 @@
-/* App specific styles can go here if needed */
+/* ======= Level Up Toast ======= */
+.levelup-toast {
+  position: fixed;
+  top: 70px; /* evita solaparse con el header sticky */
+  right: 20px;
+  z-index: 2000; /* por encima del header y overlays */
+  background: rgba(30, 30, 46, 0.95);
+  border: 1px solid var(--twitch-purple);
+  box-shadow: 0 8px 24px rgba(145, 70, 255, 0.35);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--twitch-text);
+  backdrop-filter: blur(6px);
+  animation: levelup-slide-in 350ms ease-out;
+  pointer-events: none; /* Evita interferir con clics */
+}
+
+.levelup-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.levelup-emoji {
+  font-size: 22px;
+  animation: levelup-pop 750ms ease-in-out;
+}
+
+.levelup-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.levelup-title {
+  font-weight: 700;
+  color: var(--twitch-purple);
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.levelup-level {
+  font-size: 13px;
+}
+
+.levelup-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(145, 70, 255, 0.25) inset;
+  pointer-events: none;
+}
+
+@keyframes levelup-slide-in {
+  0% { opacity: 0; transform: translate(20px, -10px) scale(0.98); }
+  60% { opacity: 1; transform: translate(0, 0) scale(1.02); }
+  100% { opacity: 1; transform: translate(0, 0) scale(1); }
+}
+
+@keyframes levelup-pop {
+  0% { transform: scale(0.8) rotate(-10deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}

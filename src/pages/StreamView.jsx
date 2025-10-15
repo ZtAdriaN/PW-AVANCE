@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DonationPanel from '../components/DonationPanel';
 import AnimationOverlay from '../components/AnimationOverlay';
 import DonationHistory from '../components/DonationHistory';
+import LevelUpToast from '../components/LevelUpToast';
 
 const StreamView = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [stream, setStream] = useState(null);
   const [donations, setDonations] = useState([]);
   const [showAnimation, setShowAnimation] = useState(false);
   const [lastDonation, setLastDonation] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [levelUpInfo, setLevelUpInfo] = useState(null); // { level }
+  const prevLevelRef = useRef(user?.level ?? 1);
 
   // Datos de ejemplo para el stream
   useEffect(() => {
@@ -148,6 +151,84 @@ const StreamView = () => {
     setDonations(initialDonations);
   }, [id]);
 
+  // Observa cambios en el nivel del usuario y muestra el popup
+  useEffect(() => {
+    if (!user || typeof user.level !== 'number') return;
+    if (user.level > (prevLevelRef.current ?? 1)) {
+      setLevelUpInfo({ level: user.level });
+      setTimeout(() => setLevelUpInfo(null), 3000);
+      // Mensaje del sistema
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: (prev[prev.length - 1]?.id || 0) + 1,
+          user: 'Sistema',
+          message: `🎉 ¡Has subido a nivel ${user.level}!`,
+          timestamp: Date.now(),
+          isSystem: true
+        }
+      ]);
+    }
+    prevLevelRef.current = user.level;
+  }, [user?.level]);
+
+  // Otorgar XP al usuario y gestionar subida de nivel con crecimiento del 20%
+  const awardXp = (xpGain) => {
+    if (!user || !Number.isFinite(xpGain) || xpGain <= 0) return;
+
+    let didLevelUp = false;
+    let newLevelLocal = null;
+
+    setUser((prev) => {
+      if (!prev) return prev;
+      const currentPoints = (prev.points ?? 0) + xpGain;
+      let points = currentPoints;
+      let level = prev.level ?? 1;
+      let pointsToNext = prev.pointsToNextLevel ?? 100;
+
+      // Consumir puntos y subir niveles mientras supere el umbral
+      while (points >= pointsToNext) {
+        points -= pointsToNext;
+        level += 1;
+        pointsToNext = Math.ceil(pointsToNext * 1.2); // +20% requerido por nivel
+        didLevelUp = true;
+        newLevelLocal = level;
+      }
+
+      const updatedUser = { 
+        ...prev, 
+        points, 
+        level, 
+        pointsToNextLevel: pointsToNext 
+      };
+
+      // Persistir inmediatamente
+      try {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      } catch {}
+
+      return updatedUser;
+    });
+
+    if (didLevelUp && newLevelLocal) {
+      setLevelUpInfo({ level: newLevelLocal });
+      // Ocultar popup después de 3s
+      setTimeout(() => setLevelUpInfo(null), 3000);
+
+      // Mensaje del sistema en el chat para avisar subida de nivel
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: (prev[prev.length - 1]?.id || 0) + 1,
+          user: 'Sistema',
+          message: `🎉 ¡Has subido a nivel ${newLevelLocal}!`,
+          timestamp: Date.now(),
+          isSystem: true
+        }
+      ]);
+    }
+  };
+
   const handleDonation = (amount, message, isAnonymous) => {
     if (!user) return;
 
@@ -174,6 +255,12 @@ const StreamView = () => {
     };
     setChatMessages(prev => [...prev, chatMessage]);
 
+    // Otorgar XP por donación: 5 gemas = 1 XP
+    const xpFromDonation = Math.floor(amount / 5);
+    if (xpFromDonation > 0) {
+      awardXp(xpFromDonation);
+    }
+
     // Ocultar animación después de 3 segundos
     setTimeout(() => setShowAnimation(false), 3000);
   };
@@ -191,6 +278,9 @@ const StreamView = () => {
 
     setChatMessages(prev => [...prev, message]);
     setNewMessage('');
+
+    // Otorgar 1 XP por mensaje enviado
+    awardXp(1);
   };
 
   if (!stream) {
@@ -274,6 +364,11 @@ const StreamView = () => {
         {/* Animation Overlay */}
         {showAnimation && lastDonation && (
           <AnimationOverlay donation={lastDonation} />
+        )}
+
+        {/* Level Up Toast */}
+        {levelUpInfo && (
+          <LevelUpToast level={levelUpInfo.level} />
         )}
 
         {/* Back Button */}

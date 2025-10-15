@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import DonationPanel from "../components/DonationPanel";
 import DonationHistory from "../components/DonationHistory";
 import "./StreamOverlay.css";
+import LevelUpToast from "../components/LevelUpToast";
 
 const StreamOverlay = () => {
   const { user } = useAuth();
@@ -19,7 +20,11 @@ const StreamOverlay = () => {
 
   // Estados del stream
   const [isLive, setIsLive] = useState(false);
-  const [streamDuration, setStreamDuration] = useState(0);
+  const [streamDuration, setStreamDuration] = useState(0); // segundos reales
+  const [simulatedHours, setSimulatedHours] = useState(0); // horas simuladas
+  const [level, setLevel] = useState(0);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const prevLevelRef = useRef(0);
   const [viewerCount, setViewerCount] = useState(0);
   const [chatMessages, setChatMessages] = useState([
     { id: 1, user: "Usuario1", message: "¡Hola! ¿Cómo estás?", timestamp: Date.now() - 45000 },
@@ -46,26 +51,55 @@ const StreamOverlay = () => {
     }
   ]);
 
-  // Efecto para el contador de tiempo
+  // Efecto para el contador de tiempo y simulación acelerada
   useEffect(() => {
     let interval;
+    let hourInterval;
+    let viewerInterval;
     if (isLive) {
+      // Contador de segundos reales
       interval = setInterval(() => {
         setStreamDuration(prev => prev + 1);
       }, 1000);
-      
+
+      // Simulación: cada minuto real suma 1 hora simulada
+      hourInterval = setInterval(() => {
+        setSimulatedHours(prev => prev + 1);
+      }, 60000); // 60000 ms = 1 min real
+
       // Simular viewers fluctuando
-      const viewerInterval = setInterval(() => {
+      viewerInterval = setInterval(() => {
         setViewerCount(prev => Math.max(0, prev + Math.floor(Math.random() * 3) - 1));
       }, 5000);
-      
+
       return () => {
         clearInterval(interval);
+        clearInterval(hourInterval);
         clearInterval(viewerInterval);
       };
     }
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearInterval(hourInterval);
+      clearInterval(viewerInterval);
+    };
   }, [isLive]);
+
+  // Efecto para calcular nivel y mostrar notificación al subir de nivel
+  useEffect(() => {
+    // Nivel = horas simuladas (sube cada hora)
+    if (simulatedHours > prevLevelRef.current) {
+      setLevel(simulatedHours);
+      setShowLevelUp(true);
+      prevLevelRef.current = simulatedHours;
+      // Guardar nivel en localStorage para reflejar en Mi Perfil
+      if (user?.id) {
+        localStorage.setItem(`level_${user.id}`, simulatedHours);
+      }
+      // Ocultar toast después de 3 segundos
+      setTimeout(() => setShowLevelUp(false), 3000);
+    }
+  }, [simulatedHours, user]);
 
   // Formatear tiempo
   const formatTime = (seconds) => {
@@ -81,7 +115,18 @@ const StreamOverlay = () => {
       setIsLive(true);
       setViewerCount(Math.floor(Math.random() * 10) + 1);
       setStreamDuration(0);
-      
+      // Leer nivel guardado en localStorage
+      let startLevel = 0;
+      if (user?.id) {
+        const storedLevel = localStorage.getItem(`level_${user.id}`);
+        if (storedLevel !== null) {
+          startLevel = Number(storedLevel);
+        }
+      }
+      setSimulatedHours(startLevel);
+      setLevel(startLevel);
+      prevLevelRef.current = startLevel;
+
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
         id: Date.now(),
@@ -93,7 +138,9 @@ const StreamOverlay = () => {
     } else {
       setIsLive(false);
       setViewerCount(0);
-      
+      // No reiniciar simulatedHours ni level al apagar stream
+      // prevLevelRef.current se mantiene
+
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
         id: Date.now(),
@@ -158,6 +205,8 @@ const StreamOverlay = () => {
 
   return (
     <div className="main-content">
+      {/* Notificación de subida de nivel */}
+      {showLevelUp && <LevelUpToast level={level} />}
       <div className="content">
         {/* Header con controles del stream */}
         <div className="stream-overlay-header">

@@ -1,0 +1,33 @@
+/* ---- LevelConfig ---- */
+.lc-wrap { max-width: 960px; margin: 0 auto; padding: 20px; }
+.lc-title { font-size: 24px; font-weight: 700; color: var(--twitch-text); text-align: center; margin-bottom: 16px; }
+
+.lc-card { background: var(--twitch-darker); border: 1px solid var(--twitch-gray); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+.lc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; }
+.lc-field { display: flex; flex-direction: column; gap: 6px; }
+.lc-field label { font-size: 13px; color: var(--twitch-text-gray); }
+.lc-field input, .lc-field select {
+  padding: 10px 12px; border-radius: 6px; border: 1px solid var(--twitch-light-gray);
+  background: var(--twitch-dark); color: var(--twitch-text);
+}
+.lc-field input:focus, .lc-field select:focus { outline: none; border-color: var(--twitch-purple); }
+
+.lc-actions { display: flex; gap: 8px; align-items: center; }
+.lc-btn { background: var(--twitch-gray); color: var(--twitch-text); border-radius: 8px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+.lc-btn.primary { background: var(--twitch-purple); color: #fff; }
+.lc-saved { color: #00ff88; font-weight: 700; }
+
+.lc-subtitle { color: var(--twitch-purple); font-size: 18px; margin-bottom: 10px; }
+.lc-table { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.lc-th { font-weight: 700; color: var(--twitch-text); border-bottom: 1px solid var(--twitch-gray); padding-bottom: 6px; }
+.lc-td { display: flex; align-items: center; }
+.lc-td input {
+  width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--twitch-light-gray);
+  background: var(--twitch-dark); color: var(--twitch-text);
+}
+
+.lc-hint { color: var(--twitch-text-gray); margin-top: 10px; font-size: 13px; }
+
+@media (max-width: 680px) {
+  .lc-grid { grid-template-columns: 1fr 1fr; }
+}

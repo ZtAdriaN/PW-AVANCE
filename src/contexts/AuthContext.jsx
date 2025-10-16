@@ -136,20 +136,10 @@ export const AuthProvider = ({ children }) => {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-
-      // Convertir imagen a base64 si se sube una foto
-      function toBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      }
-
       let profilePictureUrl;
+
       if (profilePicture) {
-        profilePictureUrl = await toBase64(profilePicture);
+        profilePictureUrl = URL.createObjectURL(profilePicture);
       } else {
         profilePictureUrl = "/src/assets/default-avatar.svg";
       }
@@ -196,34 +186,6 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("currentUser");
-    window.location.href = '/login';
-  };
-
-  // Nueva función para sumar puntos y subir de nivel automáticamente
-  const addPointsAndLevelUp = (pointsToAdd) => {
-    setUser((prevUser) => {
-      if (!prevUser) return prevUser;
-      let newPoints = (prevUser.points || 0) + pointsToAdd;
-      let newLevel = prevUser.level || 1;
-      let newPointsToNextLevel = prevUser.pointsToNextLevel || 100;
-
-      // Subir de nivel mientras los puntos sean suficientes
-      while (newPoints >= newPointsToNextLevel) {
-        newPoints -= newPointsToNextLevel;
-        newLevel += 1;
-        // Opcional: puedes hacer que cada nivel requiera más puntos
-        newPointsToNextLevel = Math.floor(newPointsToNextLevel * 1.2);
-      }
-
-      const updatedUser = {
-        ...prevUser,
-        points: newPoints,
-        level: newLevel,
-        pointsToNextLevel: newPointsToNextLevel,
-      };
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-      return updatedUser;
-    });
   };
 
   const value = {
@@ -234,7 +196,6 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     loading,
-    addPointsAndLevelUp, // Exportar la función
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

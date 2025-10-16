@@ -5,42 +5,6 @@ import StreamConfigModal from "../components/StreamConfigModal";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  // Leer streams y horas desde localStorage si existen
-  const [localStreams, setLocalStreams] = React.useState(null);
-  const [localHours, setLocalHours] = React.useState(null);
-  const [refreshKey, setRefreshKey] = React.useState(0);
-
-  React.useEffect(() => {
-    if (user?.id) {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      if (currentUser) {
-        setLocalStreams(currentUser.totalStreams ?? user.totalStreams);
-        setLocalHours(currentUser.streamingHours ?? user.streamingHours);
-      } else {
-        setLocalStreams(user.totalStreams);
-        setLocalHours(user.streamingHours);
-      }
-    }
-  }, [user?.id, refreshKey]);
-
-  // Verificar actualizaciones en localStorage cada segundo
-  React.useEffect(() => {
-    const checkForUpdates = () => {
-      if (user?.id) {
-        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        if (currentUser && currentUser.id === user.id) {
-          // Si hay nuevos datos en localStorage, actualizar el estado
-          if (currentUser.totalStreams !== localStreams || 
-              currentUser.streamingHours !== localHours) {
-            setRefreshKey(prev => prev + 1);
-          }
-        }
-      }
-    };
-
-    const interval = setInterval(checkForUpdates, 1000); // Verificar cada segundo
-    return () => clearInterval(interval);
-  }, [user?.id, localStreams, localHours]);
   const navigate = useNavigate();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [streamConfig, setStreamConfig] = useState(() => {
@@ -65,54 +29,10 @@ const Dashboard = () => {
     );
   }
 
-  if (user.role !== 'streamer') {
-    return (
-      <div className="main-content">
-        <div className="content">
-          <div className="page-content">
-            <h1 className="page-title">Dashboard</h1>
-            <p>Solo los streamers pueden acceder al dashboard.</p><br />
-            <Link to="/" className="back-button">
-              Volver al inicio
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Obtener los datos más actualizados (localStorage puede tener datos más recientes)
-  const getCurrentUserData = () => {
-    try {
-      const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
-      const found = users.find(u => u.id === user.id);
-      if (found) {
-        return {
-          totalStreams: found.totalStreams || 0,
-          streamingHours: found.streamingHours || 0
-        };
-      }
-      // Fallback a currentUser si no está en registeredUsers
-      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-      if (currentUser && currentUser.id === user.id) {
-        return {
-          totalStreams: currentUser.totalStreams || 0,
-          streamingHours: currentUser.streamingHours || 0
-        };
-      }
-    } catch (error) {
-      console.error('Error reading localStorage:', error);
-    }
-    return {
-      totalStreams: user.totalStreams || 0,
-      streamingHours: user.streamingHours || 0
-    };
-  };
-
-  const currentData = getCurrentUserData();
-  const totalStreams = currentData.totalStreams;
-  const streamingHours = currentData.streamingHours;
-  const averageStreamDuration = totalStreams > 0 ? (streamingHours / totalStreams).toFixed(1) : 0;
+  const averageStreamDuration =
+    user.totalStreams > 0
+      ? (user.streamingHours / user.totalStreams).toFixed(1)
+      : 0;
 
   // Funciones para manejar el stream
   const [isStartingStream, setIsStartingStream] = useState(false);
@@ -176,7 +96,7 @@ const Dashboard = () => {
               <div className="stat-card primary">
                 <div className="stat-icon">⏰</div>
                 <div className="stat-content">
-                  <div className="stat-number">{streamingHours}</div>
+                  <div className="stat-number">{user.streamingHours}</div>
                   <div className="stat-title">Horas Totales</div>
                   <div className="stat-subtitle">de transmisión</div>
                 </div>
@@ -185,7 +105,7 @@ const Dashboard = () => {
               <div className="stat-card secondary">
                 <div className="stat-icon">📺</div>
                 <div className="stat-content">
-                  <div className="stat-number">{totalStreams}</div>
+                  <div className="stat-number">{user.totalStreams}</div>
                   <div className="stat-title">Streams</div>
                   <div className="stat-subtitle">realizados</div>
                 </div>
@@ -204,7 +124,7 @@ const Dashboard = () => {
                 <div className="stat-icon">💎</div>
                 <div className="stat-content">
                   <div className="stat-number">
-                    {user.gems?.toLocaleString() || 0}
+                    {user.gems.toLocaleString()}
                   </div>
                   <div className="stat-title">Gemas</div>
                   <div className="stat-subtitle">disponibles</div>
@@ -265,7 +185,7 @@ const Dashboard = () => {
               <h3>Acciones Rápidas</h3>
               <div className="quick-actions">
                 {user.role === "streamer" ? (
-                  <div className="actions-grid">
+                  <>
                     <button 
                       className="action-button primary"
                       onClick={handleStartStream}
@@ -280,21 +200,11 @@ const Dashboard = () => {
                       <span className="action-icon">⚙️</span>
                       {streamConfig ? 'Editar Configuración' : 'Configurar Stream'}
                     </button>
-                    <Link 
-                      to="/mi-tienda" 
-                      className="action-button store"
-                    >
+                    <Link to="/mi-tienda" className="action-button">
                       <span className="action-icon">🛒</span>
                       Mi Tienda
                     </Link>
-                    <Link 
-                      to="/profile" 
-                      className="action-button tertiary"
-                    >
-                      <span className="action-icon">👤</span>
-                      Ver Perfil
-                    </Link>
-                  </div>
+                  </>
                 ) : (
                   <>
                     <Link to="/" className="action-button primary">
@@ -307,6 +217,10 @@ const Dashboard = () => {
                     </button>
                   </>
                 )}
+                <Link to="/profile" className="action-button tertiary">
+                  <span className="action-icon">👤</span>
+                  Ver Perfil
+                </Link>
               </div>
             </div>
           </div>

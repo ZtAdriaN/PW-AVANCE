@@ -20,6 +20,8 @@ import RegalosSubs from "./pages/RegalosSubs";
 import StreamerStore from "./pages/StreamerStore";
 import StoreView from "./pages/StoreView";
 import PublicProfile from "./pages/PublicProfile";
+import LevelConfig from "./pages/LevelConfig";
+import RequireStreamer from "./pages/RequireStreamer";
 
 function App() {
   return (
@@ -43,6 +45,14 @@ function App() {
             <Route path="/coins" element={<VVCoins />} />
             <Route path="/regalossubs" element={<RegalosSubs />} />
             <Route path="/mi-tienda" element={<StreamerStore />} />
+            <Route
+              path="/config-niveles"
+              element={
+                <RequireStreamer>
+                  <LevelConfig />
+                </RequireStreamer>
+              }
+            />
             <Route path="/tienda/:streamerId" element={<StoreView />} />
             <Route path="/user/:id" element={<PublicProfile />} />
           </Routes>

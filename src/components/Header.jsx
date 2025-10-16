@@ -20,6 +20,7 @@ const Header = () => {
         <Link to="/" className="logo">
           VeVo
         </Link>
+
         <nav className="nav-menu">
           <Link to="/" className="nav-item">
             Siguiendo
@@ -27,9 +28,22 @@ const Header = () => {
           <Link to="/categorias" className="nav-item">
             Categorías
           </Link>
-          <Link to="/Coins" className="nav-item">
+          {/* Corregimos a /coins para coincidir con tu Route */}
+          <Link to="/coins" className="nav-item">
             Comprar 💎
           </Link>
+
+          {/* Solo visible para streamers */}
+          {user?.role === "streamer" && (
+            <>
+              <Link to="/mi-tienda" className="nav-item">
+                Mi tienda
+              </Link>
+              <Link to="/config-niveles" className="nav-item">
+                Configurar niveles
+              </Link>
+            </>
+          )}
         </nav>
       </div>
 
@@ -71,6 +85,7 @@ const Header = () => {
               </g>
             </svg>
           </div>
+
           {dropdownOpen && (
             <div className="dropdown-menu">
               {user && (
@@ -89,6 +104,27 @@ const Header = () => {
                   >
                     Dashboard
                   </Link>
+
+                  {/* Accesos rápidos solo para streamer en el menú */}
+                  {user.role === "streamer" && (
+                    <>
+                      <Link
+                        to="/mi-tienda"
+                        className="dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Mi tienda
+                      </Link>
+                      <Link
+                        to="/config-niveles"
+                        className="dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Configurar niveles
+                      </Link>
+                    </>
+                  )}
+
                   <button
                     className="dropdown-item logout-btn"
                     onClick={handleLogout}
@@ -97,6 +133,7 @@ const Header = () => {
                   </button>
                 </>
               )}
+
               <Link
                 to="/about"
                 className="dropdown-item"

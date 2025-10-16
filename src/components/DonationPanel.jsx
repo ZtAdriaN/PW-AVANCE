@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 const DonationPanel = ({ onDonate, userGems, streamerName }) => {
-  const { user, setUser, addPointsAndLevelUp } = useAuth();
+  const { user, setUser } = useAuth();
   const [selectedAmount, setSelectedAmount] = useState(50);
   const [customAmount, setCustomAmount] = useState('');
   const [message, setMessage] = useState('');
@@ -48,8 +48,6 @@ const DonationPanel = ({ onDonate, userGems, streamerName }) => {
     const updatedUser = { ...user, gems: user.gems - amount };
     setUser(updatedUser);
     localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    // Sumar puntos y subir nivel si corresponde (puedes ajustar la cantidad de puntos por donación)
-    addPointsAndLevelUp(amount); // Aquí cada gema donada suma 1 punto
     onDonate(amount, message, isAnonymous); // Esto actualiza el estado del padre
 
     // Reset form

@@ -2,138 +2,238 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import "./Tienda.css";
 
-const StreamerStore = () => {
+const STORAGE_KEY = (id) => `store_${id}`;
+
+export default function StreamerStore() {
   const { user } = useContext(AuthContext);
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({ name: "", price: "", points: "" });
 
+  const [editingId, setEditingId] = useState(null);
+  const [editDraft, setEditDraft] = useState({ name: "", price: "", points: "" });
+  const [error, setError] = useState("");
+
+  // Load items del streamer
   useEffect(() => {
-    const storedItems =
-      JSON.parse(localStorage.getItem(`store_${user.id}`)) || [];
-    setItems(storedItems);
-  }, [user.id]);
+    if (!user?.id) return;
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY(user.id))) || [];
+    setItems(stored);
+  }, [user?.id]);
 
-  const handleAddItem = () => {
-    if (!newItem.name || !newItem.price || !newItem.points) return;
+  // Persist helper
+  const persist = (next) => {
+    setItems(next);
+    localStorage.setItem(STORAGE_KEY(user.id), JSON.stringify(next));
+  };
 
-    const updatedItems = [...items, { ...newItem, id: Date.now() }];
-    setItems(updatedItems);
-    localStorage.setItem(`store_${user.id}`, JSON.stringify(updatedItems));
+  // Validaciones
+  const validate = ({ name, price, points }) => {
+    if (!name?.trim()) return "El nombre es obligatorio.";
+    const p = Number(price);
+    const pts = Number(points);
+    if (!Number.isFinite(p) || p <= 0) return "El costo debe ser un número > 0.";
+    if (!Number.isInteger(pts) || pts <= 0) return "Los puntos deben ser un entero > 0.";
+    return "";
+  };
+
+  // Crear
+  const handleAdd = (e) => {
+    e.preventDefault();
+    const msg = validate(newItem);
+    if (msg) return setError(msg);
+
+    const toSave = {
+      id: Date.now(),
+      name: newItem.name.trim(),
+      price: Number(newItem.price),
+      points: Number(newItem.points),
+    };
+    persist([toSave, ...items]);
     setNewItem({ name: "", price: "", points: "" });
+    setError("");
   };
 
-
-  // Estado para edición
-  const [editId, setEditId] = useState(null);
-  const [editItem, setEditItem] = useState({ name: '', price: '', points: '' });
-
-  const handleEditClick = (item) => {
-    setEditId(item.id);
-    setEditItem({ name: item.name, price: item.price, points: item.points });
+  // Editar (entrar en modo edición)
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    setEditDraft({ name: item.name, price: item.price, points: item.points });
+    setError("");
   };
 
-  const handleEditSave = (id) => {
-    const updatedItems = items.map((item) =>
-      item.id === id ? { ...item, ...editItem } : item
+  // Guardar edición
+  const saveEdit = () => {
+    const msg = validate(editDraft);
+    if (msg) return setError(msg);
+
+    const next = items.map((it) =>
+      it.id === editingId
+        ? {
+            ...it,
+            name: editDraft.name.trim(),
+            price: Number(editDraft.price),
+            points: Number(editDraft.points),
+          }
+        : it
     );
-    setItems(updatedItems);
-    localStorage.setItem(`store_${user.id}`, JSON.stringify(updatedItems));
-    setEditId(null);
-    setEditItem({ name: '', price: '', points: '' });
+    persist(next);
+    setEditingId(null);
+    setError("");
   };
 
-  const handleEditCancel = () => {
-    setEditId(null);
-    setEditItem({ name: '', price: '', points: '' });
+  // Cancelar edición
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditDraft({ name: "", price: "", points: "" });
+    setError("");
   };
 
+  // Eliminar
   const handleDelete = (id) => {
-    const updatedItems = items.filter((item) => item.id !== id);
-    setItems(updatedItems);
-    localStorage.setItem(`store_${user.id}`, JSON.stringify(updatedItems));
+    const next = items.filter((it) => it.id !== id);
+    persist(next);
   };
 
   return (
     <div className="store-container">
-      <h1 className="store-title">Mi tienda (Streamer)</h1>
+      <h1 className="store-title">Mi Tienda de Regalos</h1>
 
-      <div className="store-form">
-        <input
-          type="text"
-          placeholder="Nombre del objeto"
-          value={newItem.name}
-          onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-          className="store-input"
-        />
-        <input
-          type="number"
-          placeholder="Precio en monedas"
-          value={newItem.price}
-          onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
-          className="store-input"
-        />
-        <input
-          type="number"
-          placeholder="Puntos que otorga"
-          value={newItem.points}
-          onChange={(e) => setNewItem({ ...newItem, points: e.target.value })}
-          className="store-input"
-        />
-        <button onClick={handleAddItem} className="store-button">
-          Agregar
-        </button>
-      </div>
+      <form className="store-form" onSubmit={handleAdd} noValidate>
+        <div className="store-field">
+          <label htmlFor="name">Nombre del regalo</label>
+          <input
+            id="name"
+            type="text"
+            value={newItem.name}
+            onChange={(e) => setNewItem((s) => ({ ...s, name: e.target.value }))}
+            placeholder="Ej. Saludo en vivo"
+            required
+          />
+        </div>
 
-      <h2 className="store-subtitle">Objetos en venta</h2>
+        <div className="store-field">
+          <label htmlFor="price">Costo (monedas)</label>
+          <input
+            id="price"
+            type="number"
+            min="1"
+            step="0.01"
+            value={newItem.price}
+            onChange={(e) => setNewItem((s) => ({ ...s, price: e.target.value }))}
+            placeholder="Ej. 250"
+            required
+          />
+        </div>
+
+        <div className="store-field">
+          <label htmlFor="points">Puntos</label>
+          <input
+            id="points"
+            type="number"
+            min="1"
+            step="1"
+            value={newItem.points}
+            onChange={(e) => setNewItem((s) => ({ ...s, points: e.target.value }))}
+            placeholder="Ej. 30"
+            required
+          />
+        </div>
+
+        <button className="store-add">Añadir</button>
+      </form>
+
+      {error && <div className="store-error">{error}</div>}
 
       {items.length === 0 ? (
-        <p className="store-empty">No hay productos aún</p>
+        <p className="store-empty">Aún no tienes regalos. ¡Crea el primero!</p>
       ) : (
-        <div className="store-items">
-          {items.map((item) => (
-            <div key={item.id} className="store-item-card">
-              {editId === item.id ? (
-                <>
-                  <input
-                    type="text"
-                    value={editItem.name}
-                    onChange={e => setEditItem({ ...editItem, name: e.target.value })}
-                    className="store-input"
-                  />
-                  <input
-                    type="number"
-                    value={editItem.price}
-                    onChange={e => setEditItem({ ...editItem, price: e.target.value })}
-                    className="store-input"
-                  />
-                  <input
-                    type="number"
-                    value={editItem.points}
-                    onChange={e => setEditItem({ ...editItem, points: e.target.value })}
-                    className="store-input"
-                  />
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                    <button onClick={() => handleEditSave(item.id)} className="store-button">Guardar</button>
-                    <button onClick={handleEditCancel} className="store-item-delete">Cancelar</button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3>{item.name}</h3>
-                  <p>💰 {item.price} coins</p>
-                  <p>⭐ {item.points} pts</p>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                    <button onClick={() => handleEditClick(item)} className="store-button">Editar</button>
-                    <button onClick={() => handleDelete(item.id)} className="store-item-delete">Eliminar</button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+        <div className="store-grid">
+          {items.map((item) => {
+            const isEditing = editingId === item.id;
+            return (
+              <article key={item.id} className="store-item">
+                {!isEditing ? (
+                  <>
+                    <header className="store-item-header">
+                      <h3 className="store-item-name">{item.name}</h3>
+                    </header>
+                    <div className="store-item-info">
+                      <span className="store-item-chip">💰 {item.price}</span>
+                      <span className="store-item-chip">⭐ {item.points} pts</span>
+                    </div>
+                    <div className="store-item-actions">
+                      <button
+                        type="button"
+                        className="store-item-btn"
+                        onClick={() => startEdit(item)}
+                        aria-label={`Editar ${item.name}`}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="store-item-btn danger"
+                        onClick={() => handleDelete(item.id)}
+                        aria-label={`Eliminar ${item.name}`}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="store-edit-row">
+                      <label>Nombre</label>
+                      <input
+                        type="text"
+                        value={editDraft.name}
+                        onChange={(e) =>
+                          setEditDraft((s) => ({ ...s, name: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="store-edit-row">
+                      <label>Costo</label>
+                      <input
+                        type="number"
+                        min="1"
+                        step="0.01"
+                        value={editDraft.price}
+                        onChange={(e) =>
+                          setEditDraft((s) => ({ ...s, price: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="store-edit-row">
+                      <label>Puntos</label>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={editDraft.points}
+                        onChange={(e) =>
+                          setEditDraft((s) => ({ ...s, points: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="store-item-actions">
+                      <button type="button" className="store-item-btn" onClick={saveEdit}>
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        className="store-item-btn ghost"
+                        onClick={cancelEdit}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>
   );
-};
-
-export default StreamerStore;
+}

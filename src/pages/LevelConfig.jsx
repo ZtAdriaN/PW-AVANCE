@@ -127,10 +127,6 @@ export default function LevelConfig() {
             </React.Fragment>
           ))}
         </div>
-        <p className="lc-hint">
-          Esta configuración se guarda por streamer en <code>localStorage</code> (clave <code>levelConfig_&lt;idStreamer&gt;</code>). 
-          Los espectadores de este canal deberán usar esta tabla para calcular su “falta para el siguiente nivel”.
-        </p>
       </section>
     </div>
   );

@@ -1,14 +1,19 @@
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { sequelize } = require('./models');
+var app = express();
+const cors = require('cors');
+app.use(cors());
+
+// Servir archivos estáticos de la carpeta public/images
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

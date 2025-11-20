@@ -13,14 +13,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-    return storedUser
-      ? {
-          ...storedUser,
-          points: storedUser.points ?? 0,
-          pointsToNextLevel: storedUser.pointsToNextLevel ?? 100,
-          level: storedUser.level ?? 1,
-        }
-      : null;
+    return storedUser ? storedUser : null;
   });
 
   useEffect(() => {
@@ -64,9 +57,36 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    // Primero intenta con el backend
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      const response = await fetch('http://localhost:3000/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const result = await response.json();
+      if (result && result.id) {
+        const userData = {
+          id: result.id,
+          name: result.name || result.username || '',
+          username: result.name || result.username || '',
+          email: result.email,
+          profilePicture: result.profilePicture || '/src/assets/default-avatar.svg',
+          role: result.role || 'user',
+          gems: result.gems || 1000,
+          level: result.level || 1,
+          points: result.points || 0,
+          pointsToNextLevel: result.pointsToNextLevel || 100,
+          streamingHours: result.streamingHours || 0,
+          totalStreams: result.totalStreams || 0,
+          isStreamer: result.isStreamer || false
+        };
+        setUser(userData);
+        localStorage.setItem("currentUser", JSON.stringify(userData));
+        return { success: true, user: userData };
+      }
+    } catch (error) {
+      // Si falla el backend, intenta con local
       const registeredUser = findUserByEmail(email);
       if (!registeredUser) {
         return {
@@ -74,11 +94,9 @@ export const AuthProvider = ({ children }) => {
           error: "No existe una cuenta con este correo electrónico",
         };
       }
-
       if (registeredUser.password !== password) {
         return { success: false, error: "Contraseña incorrecta" };
       }
-
       const userData = {
         id: registeredUser.id,
         email: registeredUser.email,
@@ -92,13 +110,11 @@ export const AuthProvider = ({ children }) => {
         streamingHours: registeredUser.streamingHours || 0,
         totalStreams: registeredUser.totalStreams || 0,
       };
-
       setUser(userData);
       localStorage.setItem("currentUser", JSON.stringify(userData));
       return { success: true, user: userData };
-    } catch (error) {
-      return { success: false, error: "Error al iniciar sesión" };
     }
+    return { success: false, error: "Error al iniciar sesión" };
   };
 
   const register = async (
@@ -109,7 +125,36 @@ export const AuthProvider = ({ children }) => {
     profilePicture,
     role = "user"
   ) => {
+    // Intenta primero con el backend
     try {
+      const response = await fetch('http://localhost:3000/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: username, email, password, role })
+      });
+      const result = await response.json();
+      if (result && result.id) {
+        const userData = {
+          id: result.id,
+          name: result.name || username,
+          username: result.name || username,
+          email: result.email,
+          profilePicture: profilePicture ? URL.createObjectURL(profilePicture) : '/src/assets/default-avatar.svg',
+          role: result.role || role,
+          gems: result.gems || 1000,
+          level: result.level || 1,
+          points: result.points || 0,
+          pointsToNextLevel: result.pointsToNextLevel || 100,
+          streamingHours: result.streamingHours || 0,
+          totalStreams: result.totalStreams || 0,
+          isStreamer: result.isStreamer || false
+        };
+        setUser(userData);
+        localStorage.setItem("currentUser", JSON.stringify(userData));
+        return { success: true };
+      }
+    } catch (error) {
+      // Si falla el backend, usa local
       if (!username || username.length < 3) {
         return {
           success: false,
@@ -125,7 +170,6 @@ export const AuthProvider = ({ children }) => {
           error: "La contraseña debe tener al menos 6 caracteres",
         };
       }
-
       const existingUser = findUserByEmail(email);
       if (existingUser) {
         return {
@@ -133,17 +177,12 @@ export const AuthProvider = ({ children }) => {
           error: "Ya existe una cuenta con este correo electrónico",
         };
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       let profilePictureUrl;
-
       if (profilePicture) {
         profilePictureUrl = URL.createObjectURL(profilePicture);
       } else {
         profilePictureUrl = "/src/assets/default-avatar.svg";
       }
-
       const userData = {
         id: Date.now(),
         email,
@@ -158,29 +197,12 @@ export const AuthProvider = ({ children }) => {
         streamingHours: 0,
         totalStreams: 0,
       };
-
       saveRegisteredUser(userData);
-
-      const sessionData = {
-        id: userData.id,
-        email: userData.email,
-        username: userData.username,
-        profilePicture: userData.profilePicture,
-        role: userData.role,
-        gems: userData.gems,
-        level: userData.level,
-        points: userData.points,
-        pointsToNextLevel: userData.pointsToNextLevel,
-        streamingHours: userData.streamingHours,
-        totalStreams: userData.totalStreams,
-      };
-
-      setUser(sessionData);
-      localStorage.setItem("currentUser", JSON.stringify(sessionData));
+      setUser(userData);
+      localStorage.setItem("currentUser", JSON.stringify(userData));
       return { success: true };
-    } catch (error) {
-      return { success: false, error: "Error al registrar usuario" };
     }
+    return { success: false, error: "Error al registrar usuario" };
   };
 
   const logout = () => {

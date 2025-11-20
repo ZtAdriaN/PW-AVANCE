@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "andrew",
+    "password": "12345",
+    "database": "proyecto_pw",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "andrew",
+    "password": "12345",
+    "database": "proyecto_pw_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "andrew",
+    "password": "12345",
+    "database": "proyecto_pw_prod",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

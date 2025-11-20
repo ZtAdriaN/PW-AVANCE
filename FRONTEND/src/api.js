@@ -1,3 +1,34 @@
+// Listar todos los usuarios
+export async function getAllUsers() {
+  const response = await fetch('http://localhost:3000/users/all');
+  return await response.json();
+}
+
+// Buscar usuarios por nombre o email
+export async function searchUsers(query) {
+  const response = await fetch(`http://localhost:3000/users/search?q=${encodeURIComponent(query)}`);
+  return await response.json();
+}
+
+// Eliminar usuario
+export async function deleteUser(id) {
+  const response = await fetch(`http://localhost:3000/users/${id}`, {
+    method: 'DELETE'
+  });
+  return await response.json();
+}
+
+// Verificar si el usuario es streamer
+export async function isUserStreamer(id) {
+  const response = await fetch(`http://localhost:3000/users/${id}/isStreamer`);
+  return await response.json();
+}
+
+// Obtener streams del usuario
+export async function getUserStreams(id) {
+  const response = await fetch(`http://localhost:3000/users/${id}/streams`);
+  return await response.json();
+}
 // Funciones para conectar el frontend con el backend usando fetch
 
 export async function registerUser(data) {
@@ -42,10 +73,6 @@ export async function getUserPurchases(userId) {
   return await response.json();
 }
 
-export async function getAllUsers() {
-  const response = await fetch('http://localhost:3000/users');
-  return await response.json();
-}
 
 export async function getUserLevel(userId) {
   const response = await fetch(`http://localhost:3000/users/${userId}/level`);

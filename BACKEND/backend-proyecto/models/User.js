@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -24,32 +24,23 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'user',
+    },
+    isStreamer: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    role: {
-      type: DataTypes.ENUM('user', 'streamer', 'admin'),
-      defaultValue: 'user',
-    },
-    gems: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-    },
-    points: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    pointsToNextLevel: {
-      type: DataTypes.INTEGER,
-      defaultValue: 100,
+      defaultValue: '/src/assets/default-avatar.svg',
     }
   }, {
-    timestamps: true,
+    timestamps: false,
   });
 
   return User;

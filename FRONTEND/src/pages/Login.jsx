@@ -12,7 +12,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -31,7 +31,28 @@ const Login = () => {
     const result = await loginUser(formData);
 
     if (result.id) {
-      if (result.role === 'streamer') {
+      // Guardar usuario en localStorage y contexto con todos los campos esperados
+      const userData = {
+        id: result.id,
+        name: result.name || result.username || '',
+        username: result.name || result.username || '',
+        email: result.email,
+        profilePicture: result.profilePicture || '/src/assets/default-avatar.svg',
+        role: result.role || 'user',
+        streamingHours: result.streamingHours || 0,
+        totalStreams: result.totalStreams || 0,
+        gems: result.gems || 1000,
+        level: result.level || 1,
+        points: result.points || 0,
+        pointsToNextLevel: result.pointsToNextLevel || 100,
+        isStreamer: result.isStreamer || false
+      };
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      setUser(userData);
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new Event('storage'));
+      }
+      if (userData.role === 'streamer' || userData.isStreamer) {
         navigate('/dashboard');
       } else {
         navigate('/');

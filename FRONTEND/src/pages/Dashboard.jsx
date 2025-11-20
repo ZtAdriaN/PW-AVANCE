@@ -74,7 +74,7 @@ const Dashboard = () => {
             <div className="dashboard-header">
               <div className="user-summary">
                 <img
-                  src={user.profilePicture}
+                  src={user.profilePicture ? `http://localhost:3000${user.profilePicture}` : '/src/assets/default-avatar.svg'}
                   alt={user.username}
                   className="dashboard-avatar"
                 />

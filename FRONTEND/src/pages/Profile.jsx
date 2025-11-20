@@ -55,7 +55,7 @@ const Profile = () => {
           <div className="profile-container">
             <div className="profile-header">
               <div className="profile-avatar">
-                <img src={user.profilePicture} alt={user.username} />
+                <img src={user.profilePicture ? `http://localhost:3000${user.profilePicture}` : '/src/assets/default-avatar.svg'} alt={user.username} />
               </div>
               <div className="profile-info">
                 <h2>{user.username}</h2>

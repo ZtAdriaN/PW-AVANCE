@@ -18,7 +18,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  const { register } = useAuth();
+  const { register, setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -60,19 +60,70 @@ const Register = () => {
     setLoading(true);
     setError('');
 
-    const result = await register(formData.username, formData.email, formData.password, formData.confirmPassword, formData.profilePicture, formData.role);
-    
-    if (result.success) {
-      // Redirigir según el rol
+    // Validaciones básicas
+    if (!formData.username || formData.username.length < 3) {
+      setError('El nombre de usuario debe tener al menos 3 caracteres');
+      setLoading(false);
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      setLoading(false);
+      return;
+    }
+
+    // Enviar datos al backend como FormData
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.username);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('role', formData.role);
+    formDataToSend.append('isStreamer', formData.role === 'streamer');
+    if (formData.profilePicture) {
+      formDataToSend.append('profilePicture', formData.profilePicture);
+    }
+
+    const response = await fetch('http://localhost:3000/users/register', {
+      method: 'POST',
+      body: formDataToSend
+    });
+    const result = await response.json();
+
+    if (result && result.id) {
+      // Guardar usuario en contexto y localStorage para iniciar sesión automáticamente
+      const userData = {
+        id: result.id,
+        name: result.name,
+        username: result.name, // Para compatibilidad con dashboard
+        email: result.email,
+        profilePicture: result.profilePicture || '/src/assets/default-avatar.svg',
+        role: formData.role || 'user',
+        streamingHours: 0,
+        totalStreams: 0,
+        gems: 1000,
+        level: 1,
+        points: 0,
+        pointsToNextLevel: 100,
+        isStreamer: result.isStreamer || false
+      };
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      setUser(userData);
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new Event('storage'));
+      }
       if (formData.role === 'streamer') {
         navigate('/dashboard');
       } else {
         navigate('/');
       }
     } else {
-      setError(result.error);
+      setError(result.error || 'Error al registrar usuario');
     }
-    
     setLoading(false);
   };
 

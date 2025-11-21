@@ -15,9 +15,9 @@ const Level = require('./Level')(sequelize);
 
 
 // Relaciones Usuario-Donación
-User.hasMany(Donation, { foreignKey: 'donorId', as: 'donationsMade' });
+User.hasMany(Donation, { foreignKey: 'donadorId', as: 'donationsMade' });
 User.hasMany(Donation, { foreignKey: 'streamerId', as: 'donationsReceived' });
-Donation.belongsTo(User, { foreignKey: 'donorId', as: 'donor' });
+Donation.belongsTo(User, { foreignKey: 'donadorId', as: 'donador' });
 Donation.belongsTo(User, { foreignKey: 'streamerId', as: 'streamer' });
 
 // Relación Usuario-Producto-Compra

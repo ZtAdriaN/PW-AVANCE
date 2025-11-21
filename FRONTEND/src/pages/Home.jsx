@@ -28,7 +28,8 @@ const Home = () => {
       streamer: "bububuenas",
       category: "Charlando",
       viewers: 57,
-      thumbnail: "../images/stream3.jpg",
+      thumbnail:
+        "https://static-cdn.jtvnw.net/twitch-clips-thumbnails-prod/AmazonianUnusualQueleaBCouch-_swqhJT9jpqhuYH_/7125d082-fd52-4c37-9cfc-8dfa3c30f4d6/preview.jpg",
       isLive: true,
     },
     {

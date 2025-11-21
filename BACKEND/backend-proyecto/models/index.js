@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('proyecto_pw', 'andrew', '12345', {
+const sequelize = new Sequelize('proyecto_pw', 'root', '123456', {
   host: 'localhost',
   dialect: 'mysql',
 });
@@ -9,15 +9,16 @@ const Donation = require('./Donation')(sequelize);
 const Product = require('./Product')(sequelize);
 const Category = require('./Category')(sequelize);
 const Stream = require('./Stream')(sequelize);
+const Streamer = require('./Streamer')(sequelize);
 const Purchase = require('./Purchase')(sequelize);
 const ChatMessage = require('./ChatMessage')(sequelize);
 const Level = require('./Level')(sequelize);
 
 
 // Relaciones Usuario-Donación
-User.hasMany(Donation, { foreignKey: 'donorId', as: 'donationsMade' });
+User.hasMany(Donation, { foreignKey: 'donadorId', as: 'donationsMade' });
 User.hasMany(Donation, { foreignKey: 'streamerId', as: 'donationsReceived' });
-Donation.belongsTo(User, { foreignKey: 'donorId', as: 'donor' });
+Donation.belongsTo(User, { foreignKey: 'donadorId', as: 'donador' });
 Donation.belongsTo(User, { foreignKey: 'streamerId', as: 'streamer' });
 
 // Relación Usuario-Producto-Compra
@@ -33,6 +34,7 @@ Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
 // Relación Usuario-Stream
 User.hasMany(Stream, { foreignKey: 'streamerId', as: 'streams' });
 Stream.belongsTo(User, { foreignKey: 'streamerId', as: 'streamer' });
+
 
 // Relación Stream-ChatMessage y Usuario-ChatMessage
 Stream.hasMany(ChatMessage, { foreignKey: 'streamId', as: 'chatMessages' });
@@ -51,6 +53,7 @@ module.exports = {
   Product,
   Category,
   Stream,
+  Streamer,
   Purchase,
   ChatMessage,
   Level,

@@ -2,24 +2,34 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const Stream = sequelize.define('Stream', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false
     },
     description: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     config: {
-      type: DataTypes.JSON
+      type: DataTypes.JSON,
+      allowNull: true
     },
     startTime: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      allowNull: false
     },
     endTime: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      allowNull: true
     },
     status: {
       type: DataTypes.STRING,
+      allowNull: false,
       defaultValue: 'activo'
     },
     streamerId: {

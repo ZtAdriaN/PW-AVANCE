@@ -60,7 +60,7 @@ export async function getProducts() {
 }
 
 export async function createDonation(data) {
-  const response = await fetch('http://localhost:3000/donations/donation', {
+  const response = await fetch('http://localhost:3000/donations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -92,11 +92,5 @@ export async function getAdminDashboard() {
 
 export async function getUserNotifications(userId) {
   const response = await fetch(`http://localhost:3000/notifications/${userId}`);
-  return await response.json();
-}
-
-// Obtener donaciones recibidas por un streamer
-export async function getStreamerDonations(streamerId) {
-  const response = await fetch(`http://localhost:3000/donations/streamer/${streamerId}/received`);
   return await response.json();
 }

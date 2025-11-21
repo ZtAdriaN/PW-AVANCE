@@ -99,9 +99,6 @@ router.post('/register', upload.single('profilePicture'), async (req, res) => {
       ? `/images/${req.file.filename}`
       : '/src/assets/default-avatar.svg';
 
-    console.log('req.file:', req.file);
-    console.log('req.body:', req.body);
-
     const user = await User.create({
       name,
       email,
@@ -185,19 +182,6 @@ router.get('/:id/level', async (req, res) => {
     });
     if (!result) return res.json({ level: 1, achievedAt: null });
     res.json(result);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Endpoint para obtener streamers destacados
-router.get('/featured-streamers', async (req, res) => {
-  try {
-    const featuredStreamers = await User.findAll({
-      where: { isStreamer: true, isFeatured: true },
-      attributes: ['id', 'name', 'profilePicture', 'email'],
-    });
-    res.json(featuredStreamers);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

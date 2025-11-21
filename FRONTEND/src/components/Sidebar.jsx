@@ -7,7 +7,7 @@ const Sidebar = () => {
   const followedChannels = [
     {
       id: 1,
-      name: "nezumivy",
+      name: "anzumamao",
       category: "DEVOUR",
       viewers: 811,
       avatar:
@@ -17,7 +17,7 @@ const Sidebar = () => {
     },
     {
       id: 2,
-      name: "microbusero",
+      name: "Agus",
       category: "PEAK",
       viewers: 71,
       avatar:
@@ -39,7 +39,7 @@ const Sidebar = () => {
   const recommendedChannels = [
     {
       id: 4,
-      name: "dontstark82",
+      name: "Wapura",
       category: "Fortnite",
       viewers: 35,
       avatar:
@@ -48,7 +48,7 @@ const Sidebar = () => {
     },
     {
       id: 5,
-      name: "peoplelite",
+      name: "Chamus",
       category: "Just Chatting",
       viewers: 38,
       avatar: "https://n9.cl/onkymf",

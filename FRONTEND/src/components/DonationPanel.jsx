@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { createDonation } from '../api';
-const DonationPanel = ({ onDonate, userGems, streamerName }) => {
+const DonationPanel = ({ onDonate, userGems, streamerId, streamerName }) => {
   const { user, setUser } = useAuth();
   const [selectedAmount, setSelectedAmount] = useState(50);
   const [customAmount, setCustomAmount] = useState('');
@@ -38,7 +38,8 @@ const DonationPanel = ({ onDonate, userGems, streamerName }) => {
   const handleDonate = async (amount, message, isAnonymous) => {
     const data = {
       donorId: user.id,
-      streamerId: streamerName, // Ajusta si tienes el id real
+      streamerId: streamerId, 
+      streamerName: streamerName, // Ajusta si tienes el id real
       amount,
       message,
       isAnonymous
@@ -50,10 +51,11 @@ const DonationPanel = ({ onDonate, userGems, streamerName }) => {
   const confirmDonation = () => {
     const amount = getFinalAmount();
     if (amount > userGems) return alert("No tienes suficientes gemas");
+    handleDonate(amount, message, isAnonymous); // Enviar donación al backend
     const updatedUser = { ...user, gems: user.gems - amount };
     setUser(updatedUser);
     localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    onDonate(amount, message, isAnonymous); // Esto actualiza el estado del padre
+    onDonate(amount, message, isAnonymous);
 
     // Reset form
     setCustomAmount('');

@@ -21,6 +21,11 @@ module.exports = (sequelize) => {
       },
     },
     password: {
+      isFeatured: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -37,7 +42,7 @@ module.exports = (sequelize) => {
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: '/src/assets/default-avatar.svg',
+      defaultValue: '/assets/default-avatar.svg',
     }
   }, {
     timestamps: false,

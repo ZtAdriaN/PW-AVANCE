@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { addStreamerSecondsByName, addPointsByName } from "../api";
 import DonationPanel from "../components/DonationPanel";
 import DonationHistory from "../components/DonationHistory";
 import AnimationOverlay from "../components/AnimationOverlay2";
 import "./StreamOverlay.css";
 import LevelUpToast from "../components/LevelUpToast";
+import { createStreamByName, finishStreamByName } from "../api";
 
 const StreamOverlay = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -120,6 +122,7 @@ const StreamOverlay = () => {
       setIsLive(true);
       setViewerCount(Math.floor(Math.random() * 10) + 1);
       setStreamDuration(0);
+      
       // Leer nivel guardado en localStorage
       let startLevel = 0;
       if (user?.id) {
@@ -131,6 +134,13 @@ const StreamOverlay = () => {
       setSimulatedHours(startLevel);
       setLevel(startLevel);
       prevLevelRef.current = startLevel;
+
+      // Registrar stream en base de datos
+      if (user?.name) {
+        const cfg = { quality: streamConfig?.quality || '1080p', category: streamConfig?.category || 'Sin categoría' };
+        createStreamByName(user.name, streamConfig.title, streamConfig.description, cfg).then(() => {
+        }).catch(() => {});
+      }
 
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
@@ -146,6 +156,12 @@ const StreamOverlay = () => {
       // No reiniciar simulatedHours ni level al apagar stream
       // prevLevelRef.current se mantiene
 
+      // Finalizar stream activo en base de datos
+      if (user?.name) {
+        finishStreamByName(user.name).then(() => {
+        }).catch(() => {});
+      }
+
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
         id: Date.now(),
@@ -156,6 +172,48 @@ const StreamOverlay = () => {
       }]);
     }
   };
+
+  useEffect(() => {
+    let backendInterval;
+    if (isLive && user?.name) {
+      backendInterval = setInterval(() => {
+        setUser(prev => {
+          const shLocal = Number(prev.streamingHours || 0) + 1;
+          const updatedLocal = { ...prev, streamingHours: shLocal };
+          localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
+          return updatedLocal;
+        });
+        addStreamerSecondsByName(user.name, 10).then((r) => {
+          setUser(prev => {
+            const shRemote = Number(r?.streamingHours ?? prev.streamingHours);
+            const updated = { ...prev, streamingHours: shRemote };
+            localStorage.setItem('currentUser', JSON.stringify(updated));
+            return updated;
+          });
+        }).catch(() => {});
+        addPointsByName(user.name, 10).then((rp) => {
+          setUser(prev => {
+            const updated = {
+              ...prev,
+              level: Number(rp?.level ?? prev.level ?? 1),
+              points: Number(rp?.points ?? prev.points ?? 0),
+              pointsToNextLevel: Number(rp?.pointsToNextLevel ?? prev.pointsToNextLevel ?? 100)
+            };
+            localStorage.setItem('currentUser', JSON.stringify(updated));
+            return updated;
+          });
+          if (Number(rp?.level ?? 0) > Number(user.level ?? 0)) {
+            setLevel(Number(rp.level));
+            setShowLevelUp(true);
+            setTimeout(() => setShowLevelUp(false), 3000);
+          }
+        }).catch(() => {});
+      }, 10000);
+    }
+    return () => {
+      if (backendInterval) clearInterval(backendInterval);
+    };
+  }, [isLive, user?.id]);
 
   // Enviar mensaje al chat
   const [storeItems, setStoreItems] = useState([]);

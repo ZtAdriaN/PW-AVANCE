@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Importa tu contexto
+import { useAuth } from '../contexts/AuthContext';
+import { addGemsByName } from '../api';
 import './VVCoin.css';
 
 const PaymentMethods = () => {
@@ -13,26 +14,25 @@ const PaymentMethods = () => {
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
 
-  const handleCardSubmit = (e) => {
+  const handleCardSubmit = async (e) => {
     e.preventDefault();
     if (!user) return alert("No hay usuario logueado");
 
     const gemsToAdd = Number((state?.coins || "0💎").replace(/[^\d]/g, ""));
-
-    // Actualizamos gems en contexto
-    setUser(prevUser => ({
-      ...prevUser,
-      gems: Number(prevUser.gems + gemsToAdd)
-    }));
-
-    // Actualizamos localStorage
-    const updatedUser = { ...user, gems: Number(user.gems) + gemsToAdd };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
+    try {
+      const result = await addGemsByName(user.name, gemsToAdd);
+      const updatedUser = { ...user, gems: Number(result?.gems ?? (Number(user.gems) + gemsToAdd)) };
+      setUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    } catch (err) {
+      const updatedUser = { ...user, gems: Number(user.gems) + gemsToAdd };
+      setUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    }
     alert(`Pagaste con tarjeta ${cardNumber}. Se agregaron ${gemsToAdd} Gems!`);
   };
   
-  const handleYapePayment = () => {
+  const handleYapePayment = async () => {
   // Cantidad de gems del pack
   const gemsToAdd = Number((state?.coins || "0💎").replace(/[^\d]/g, ""));
 
@@ -40,17 +40,16 @@ const PaymentMethods = () => {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   if (!currentUser) return alert("No hay usuario logueado");
 
-  // Crear usuario actualizado
-  const updatedUser = {
-    ...currentUser,
-    gems: Number(currentUser.gems) + gemsToAdd
-  };
-
-  // Guardar en localStorage
-  localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-  // **Actualizar el estado de React** para que se refleje en pantalla
-  setUser(updatedUser);
+  try {
+    const result = await addGemsByName(currentUser.name, gemsToAdd);
+    const updatedUser = { ...currentUser, gems: Number(result?.gems ?? (Number(currentUser.gems) + gemsToAdd)) };
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  } catch (err) {
+    const updatedUser = { ...currentUser, gems: Number(currentUser.gems) + gemsToAdd };
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }
 
   alert(`Pago confirmado. Se agregaron ${gemsToAdd} Gems!`);
 };

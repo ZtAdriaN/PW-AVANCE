@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { getUserOrStreamerById, getUserOrStreamerByName } from "../api";
 import StreamConfigModal from "../components/StreamConfigModal";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const [streamConfig, setStreamConfig] = useState(() => {
@@ -31,11 +32,34 @@ const Dashboard = () => {
 
   const averageStreamDuration =
     user.totalStreams > 0
-      ? (user.streamingHours / user.totalStreams).toFixed(1)
+      ? Math.floor(Number(user.streamingHours || 0) / Number(user.totalStreams || 1))
       : 0;
 
   // Funciones para manejar el stream
   const [isStartingStream, setIsStartingStream] = useState(false);
+
+  useEffect(() => {
+    let interval;
+    if (user?.name) {
+      const refresh = async () => {
+        try {
+          const data = await getUserOrStreamerByName(user.name);
+          if (data && (data.streamingHours !== undefined || data.level !== undefined || data.points !== undefined)) {
+            setUser(prev => ({
+              ...prev,
+              streamingHours: Number(data.streamingHours ?? prev.streamingHours ?? 0),
+              level: Number(data.level ?? prev.level ?? 1),
+              points: Number(data.points ?? prev.points ?? 0),
+              pointsToNextLevel: Number(data.pointsToNextLevel ?? prev.pointsToNextLevel ?? 100)
+            }));
+          }
+        } catch {}
+      };
+      refresh();
+      interval = setInterval(refresh, 10000);
+    }
+    return () => interval && clearInterval(interval);
+  }, [user?.name]);
 
   const handleStartStream = () => {
     if (streamConfig) {
@@ -96,7 +120,7 @@ const Dashboard = () => {
               <div className="stat-card primary">
                 <div className="stat-icon">⏰</div>
                 <div className="stat-content">
-                  <div className="stat-number">{user.streamingHours}</div>
+                  <div className="stat-number">{Math.floor(Number(user.streamingHours || 0))}</div>
                   <div className="stat-title">Horas Totales</div>
                   <div className="stat-subtitle">de transmisión</div>
                 </div>
@@ -133,32 +157,27 @@ const Dashboard = () => {
             </div>
 
             <div className="dashboard-section">
-              <h3>Progreso del Mes</h3>
+              <h3>Progreso de Nivel</h3>
               <div className="progress-summary">
                 <div className="progress-item">
-                  <span className="progress-label">
-                    Meta de horas mensuales:
-                  </span>
+                  <span className="progress-label">Nivel actual:</span>
                   <div className="progress-bar-container">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        style={{ width: "60%" }}
+                        style={{ width: `${Math.min(100, Math.floor((Number(user.points || 0) / Number(user.pointsToNextLevel || 100)) * 100))}%` }}
                       ></div>
                     </div>
-                    <span className="progress-percentage">60%</span>
+                    <span className="progress-percentage">{Math.min(100, Math.floor((Number(user.points || 0) / Number(user.pointsToNextLevel || 100)) * 100))}%</span>
                   </div>
                 </div>
                 <div className="progress-item">
-                  <span className="progress-label">Streams este mes:</span>
+                  <span className="progress-label">Puntos:</span>
                   <div className="progress-bar-container">
                     <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{ width: "40%" }}
-                      ></div>
+                      <div className="progress-fill" style={{ width: "100%" }}></div>
                     </div>
-                    <span className="progress-percentage">40%</span>
+                    <span className="progress-percentage">{Number(user.points || 0)} / {Number(user.pointsToNextLevel || 100)}</span>
                   </div>
                 </div>
               </div>

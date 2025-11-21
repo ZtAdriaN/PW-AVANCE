@@ -1,4 +1,3 @@
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { sequelize } = require('./models');
 var app = express();
+
 const cors = require('cors');
 app.use(cors());
 
@@ -14,6 +14,7 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var donationsRouter = require('./routes/donations');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/donations', donationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,6 +47,7 @@ app.use(function(err, req, res, next) {
 });
 
 // Sincronizar modelos con la base de datos
+
 sequelize.sync()
   .then(() => {
     console.log('Modelos sincronizados con la base de datos');
@@ -53,4 +56,5 @@ sequelize.sync()
     console.error('Error al sincronizar modelos:', err);
   });
 
+// Exportar solo app para usar en bin/www
 module.exports = app;

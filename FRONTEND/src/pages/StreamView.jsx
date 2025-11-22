@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getStreamerDonations, addChatPoint, getUserProfile } from '../api';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DonationPanel from '../components/DonationPanel';
@@ -39,7 +40,7 @@ const getColorForLevel = (nivel) => {
         streamer: 'peoplelite',
         category: 'Fortnite',
         viewers: 38,
-        thumbnail: 'https://images.kick.com/video_thumbnails/yZF8BSxKY2CJ/KtXyGVJzbC6u/360.webp?versionId=.fLNhneVl1qT2_t31x65xn04Q6e_QRi0',
+        thumbnail: 'https://i.ytimg.com/vi/72egPkbB-Mo/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAM3x5KTJw2jqFz08n_gfH-8xV24g',
         isLive: true,
         description: '¡Jugando Fortnite con retos del chat! ¡Únete a la diversión!'
       },
@@ -141,26 +142,21 @@ const getColorForLevel = (nivel) => {
     const initialMessages = chatMessagesData[currentStream.id] || chatMessagesData[1];
     setChatMessages(initialMessages);
 
-    // Donaciones de ejemplo
-    const initialDonations = [
-      { 
-        id: 1, 
-        fromUser: 'GenerousViewer', 
-        amount: 100, 
-        message: '¡Increíble jugada!', 
-        timestamp: Date.now() - 15000,
-        isAnonymous: false
-      },
-      { 
-        id: 2, 
-        fromUser: 'Anonymous', 
-        amount: 50, 
-        message: 'Sigue así', 
-        timestamp: Date.now() - 10000,
-        isAnonymous: true
-      }
-    ];
-    setDonations(initialDonations);
+    // Cargar donaciones reales del backend
+    getStreamerDonations(currentStream.id)
+      .then(data => {
+        // Mapear datos para DonationHistory
+        const mappedDonations = Array.isArray(data) ? data.map(d => ({
+          id: d.id,
+          fromUser: d.isAnonymous ? 'Usuario Anónimo' : (d.donorUsername || d.donorName || d.donorId || 'Desconocido'),
+          amount: d.amount,
+          message: d.message,
+          timestamp: new Date(d.date || d.createdAt || Date.now()).getTime(),
+          isAnonymous: d.isAnonymous
+        })) : [];
+        setDonations(mappedDonations);
+      })
+      .catch(() => setDonations([]));
   }, [id]);
 
   // Observa cambios en el nivel del usuario y muestra el popup
@@ -241,59 +237,73 @@ const getColorForLevel = (nivel) => {
     }
   };
 
-  const handleDonation = (amount, message, isAnonymous) => {
+  const handleDonation = async (amount, message, isAnonymous) => {
     if (!user) return;
 
-    const newDonation = {
-      id: donations.length + 1,
-      fromUser: isAnonymous ? 'Usuario Anónimo' : user.username,
-      amount: amount,
-      message: message || '¡Sigue así!',
-      timestamp: Date.now(),
-      isAnonymous: isAnonymous
-    };
-
-    setDonations(prev => [newDonation, ...prev]);
-    setLastDonation(newDonation);
-    setShowAnimation(true);
-
-    // Agregar mensaje al chat
-    const chatMessage = {
-      id: chatMessages.length + 1,
-      user: 'Sistema',
-      message: `💎 ${newDonation.fromUser} ha donado ${amount} gemas!`,
-      timestamp: Date.now(),
-      isSystem: true
-    };
-    setChatMessages(prev => [...prev, chatMessage]);
-
-    // Otorgar XP por donación: 5 gemas = 1 XP
-    const xpFromDonation = Math.floor(amount / 5);
-    if (xpFromDonation > 0) {
-      awardXp(xpFromDonation);
-    }
-
-    // Ocultar animación después de 3 segundos
-    setTimeout(() => setShowAnimation(false), 3000);
+    // Enviar donación al backend
+    // DonationPanel ya llama a createDonation, aquí solo refrescamos donaciones
+    await getStreamerDonations(stream.id)
+      .then(data => {
+        const mappedDonations = Array.isArray(data) ? data.map(d => ({
+          id: d.id,
+          fromUser: d.isAnonymous ? 'Usuario Anónimo' : (d.donorUsername || d.donorName || d.donorId || 'Desconocido'),
+          amount: d.amount,
+          message: d.message,
+          timestamp: new Date(d.date || d.createdAt || Date.now()).getTime(),
+          isAnonymous: d.isAnonymous
+        })) : [];
+        setDonations(mappedDonations);
+        if (mappedDonations.length > 0) {
+          setLastDonation(mappedDonations[0]);
+          setShowAnimation(true);
+          // Agregar mensaje al chat
+          const chatMessage = {
+            id: chatMessages.length + 1,
+            user: 'Sistema',
+            message: `💎 ${mappedDonations[0].fromUser} ha donado ${mappedDonations[0].amount} gemas!`,
+            timestamp: Date.now(),
+            isSystem: true
+          };
+          setChatMessages(prev => [...prev, chatMessage]);
+          // Otorgar XP por donación: 5 gemas = 1 XP
+          const xpFromDonation = Math.floor(mappedDonations[0].amount / 5);
+          if (xpFromDonation > 0) {
+            awardXp(xpFromDonation);
+          }
+          setTimeout(() => setShowAnimation(false), 3000);
+        }
+      });
   };
 
   const handleChatSubmit = (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || !stream) return;
 
-    const message = {
-      id: chatMessages.length + 1,
-      user: user.username,
-      message: newMessage,
-      timestamp: Date.now(),
-      nivel: user.level
-    };
-
-    setChatMessages(prev => [...prev, message]);
-    setNewMessage('');
-
-    // Otorgar 1 XP por mensaje enviado
-    awardXp(1);
+    // Llamar al backend para guardar el mensaje y sumar punto
+    addChatPoint(user.id, newMessage.trim(), stream.id)
+      .then(result => {
+        if (result && result.success) {
+          // Actualizar usuario desde el backend
+          getUserProfile(user.id).then(data => {
+            if (data) {
+              setUser(data);
+            }
+          });
+          // Agregar el mensaje al chat local
+          const message = {
+            id: chatMessages.length + 1,
+            user: user.name || user.username,
+            message: newMessage,
+            timestamp: Date.now(),
+            nivel: user.level
+          };
+          setChatMessages(prev => [...prev, message]);
+          setNewMessage('');
+        }
+      })
+      .catch(err => {
+        console.error('Error al guardar mensaje y sumar punto:', err);
+      });
   };
 
   if (!stream) {
@@ -374,6 +384,7 @@ const getColorForLevel = (nivel) => {
               <DonationPanel 
                 onDonate={handleDonation} 
                 userGems={user.gems}
+                streamerId={stream.id}
                 streamerName={stream.streamer}
               />
             )}

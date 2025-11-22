@@ -68,18 +68,16 @@ export const AuthProvider = ({ children }) => {
       if (result && result.id) {
         const userData = {
           id: result.id,
-          name: result.name || result.username || '',
-          username: result.name || result.username || '',
+          name: result.name,
+          username: result.name, // compatibilidad
           email: result.email,
           profilePicture: result.profilePicture || '/src/assets/default-avatar.svg',
           role: result.role || 'user',
-          gems: result.gems ?? 1000,
-          streamingHours: result.streamingHours ?? 0,
-          totalStreams: result.totalStreams ?? 0,
+          gems: result.gems || 1000,
           level: result.level || 1,
           points: result.points || 0,
           pointsToNextLevel: result.pointsToNextLevel || 100,
-          streamingHours: result.streamingHours || 0,
+          streamingHours: result.HorasTotales || result.horastotales || result.streamingHours || 0,
           totalStreams: result.totalStreams || 0,
           isStreamer: result.isStreamer || false
         };

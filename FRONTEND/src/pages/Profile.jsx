@@ -17,7 +17,7 @@ const Profile = () => {
       }
     }
     fetchProfile();
-  }, [user?.id]);
+  }, [user]);
 
   React.useEffect(() => {
     if (user?.id) {
@@ -42,7 +42,9 @@ const Profile = () => {
     );
   }
 
-  const progressPercentage = (user.points / user.pointsToNextLevel) * 100;
+  const progressPercentage = profile && profile.pointsToNextLevel > 0
+    ? (profile.points / profile.pointsToNextLevel) * 100
+    : (user.points / user.pointsToNextLevel) * 100;
   // Usar el nivel de localStorage si existe
   const displayLevel = localLevel !== null ? localLevel : user.level;
 
@@ -58,7 +60,7 @@ const Profile = () => {
                 <img src={user.profilePicture ? `http://localhost:3000${user.profilePicture}` : '/src/assets/default-avatar.svg'} alt={user.username} />
               </div>
               <div className="profile-info">
-                <h2>{user.username}</h2>
+                <h2>{user.name ? user.name : user.username}</h2>
                 <p className="profile-email">{user.email}</p>
                 <div className="profile-gems">
                   <span className="gems-icon">💎</span>
@@ -73,7 +75,7 @@ const Profile = () => {
               <div className="level-container">
                 <div className="level-info">
                   <div className="current-level">
-                    <span className="level-number">Nivel {displayLevel}</span>
+                    <span className="level-number">Nivel {profile?.level ?? displayLevel}</span>
                   </div>
                   <div className="level-progress">
                     <div className="progress-bar">
@@ -83,31 +85,9 @@ const Profile = () => {
                       ></div>
                     </div>
                     <div className="progress-text">
-                      {user.points} / {user.pointsToNextLevel} puntos
+                      {profile?.points ?? user.points} / {profile?.pointsToNextLevel ?? user.pointsToNextLevel} puntos
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="profile-section">
-              <h3>Estadísticas</h3>
-              <div className="stats-grid">
-                <div className="stat-item">
-                  <div className="stat-value">{user.totalStreams}</div>
-                  <div className="stat-label">Streams Realizados</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-value">{user.streamingHours}h</div>
-                  <div className="stat-label">Horas Transmitidas</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-value">{displayLevel}</div>
-                  <div className="stat-label">Nivel Actual</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-value">{user.gems.toLocaleString()}</div>
-                  <div className="stat-label">Gemas Totales</div>
                 </div>
               </div>
             </div>

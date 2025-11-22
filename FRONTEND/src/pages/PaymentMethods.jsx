@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { updateUserGems, topupGems } from '../api';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { addGemsByName } from '../api';
+import { useAuth } from '../contexts/AuthContext'; // Importa tu contexto
 import './VVCoin.css';
 
 const PaymentMethods = () => {
@@ -19,40 +19,28 @@ const PaymentMethods = () => {
     if (!user) return alert("No hay usuario logueado");
 
     const gemsToAdd = Number((state?.coins || "0💎").replace(/[^\d]/g, ""));
-    try {
-      const result = await addGemsByName(user.name, gemsToAdd);
-      const updatedUser = { ...user, gems: Number(result?.gems ?? (Number(user.gems) + gemsToAdd)) };
-      setUser(updatedUser);
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    } catch (err) {
-      const updatedUser = { ...user, gems: Number(user.gems) + gemsToAdd };
-      setUser(updatedUser);
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    }
+    const newGems = Number(user.gems) + gemsToAdd;
+    // Registrar recarga en el backend
+    await topupGems(user.id, gemsToAdd, 'tarjeta');
+    // Actualizar usuario local
+    const updatedUser = { ...user, gems: newGems };
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    setUser(prevUser => ({ ...prevUser, gems: newGems }));
     alert(`Pagaste con tarjeta ${cardNumber}. Se agregaron ${gemsToAdd} Gems!`);
   };
   
   const handleYapePayment = async () => {
-  // Cantidad de gems del pack
-  const gemsToAdd = Number((state?.coins || "0💎").replace(/[^\d]/g, ""));
-
-  // Obtener usuario actual
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  if (!currentUser) return alert("No hay usuario logueado");
-
-  try {
-    const result = await addGemsByName(currentUser.name, gemsToAdd);
-    const updatedUser = { ...currentUser, gems: Number(result?.gems ?? (Number(currentUser.gems) + gemsToAdd)) };
+    if (!user) return alert("No hay usuario logueado");
+    const gemsToAdd = Number((state?.coins || "0💎").replace(/[^\d]/g, ""));
+    const newGems = Number(user.gems) + gemsToAdd;
+    // Registrar recarga en el backend
+    await topupGems(user.id, gemsToAdd, 'yape');
+    // Actualizar usuario local
+    const updatedUser = { ...user, gems: newGems };
     localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-  } catch (err) {
-    const updatedUser = { ...currentUser, gems: Number(currentUser.gems) + gemsToAdd };
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-  }
-
-  alert(`Pago confirmado. Se agregaron ${gemsToAdd} Gems!`);
-};
+    setUser(prevUser => ({ ...prevUser, gems: newGems }));
+    alert(`Pago confirmado. Se agregaron ${gemsToAdd} Gems!`);
+  };
 
   return (
     <div className="payment-container">

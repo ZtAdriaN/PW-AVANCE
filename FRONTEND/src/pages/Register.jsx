@@ -86,6 +86,10 @@ const Register = () => {
     formDataToSend.append('isStreamer', formData.role === 'streamer');
     if (formData.profilePicture) {
       formDataToSend.append('profilePicture', formData.profilePicture);
+    } else {
+      // Si no se selecciona imagen, usar el avatar por defecto
+      // Enviamos la ruta relativa, el backend debe manejar esto
+      formDataToSend.append('profilePicture', '/src/assets/default-avatar.svg');
     }
 
     const response = await fetch('http://localhost:3000/users/register', {

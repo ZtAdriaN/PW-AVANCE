@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getProducts, purchaseItem } from "../api";
-import { useAuth } from "../contexts/AuthContext";
+import { getProducts } from "../api";
 import "./Tienda.css";
 
 const StoreView = () => {
   const { streamerId } = useParams();
   const [items, setItems] = useState([]);
-  const { user, setUser } = useAuth();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -17,13 +15,9 @@ const StoreView = () => {
     fetchProducts();
   }, []);
 
-  const handleBuy = async (item) => {
-    if (!user) return alert("No hay usuario logueado");
-    const result = await purchaseItem(user.id, item.id);
-    const updatedUser = { ...user, gems: Number(result.gems) };
-    setUser(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    alert(`Compraste: ${item.name}. Nuevo saldo: ${updatedUser.gems} 💎`);
+  const handleBuy = (item) => {
+    alert(`Compraste: ${item.name} y ganaste ${item.points} puntos`);
+    // Aquí se integrará con el saldo del usuario
   };
 
   return (

@@ -73,7 +73,7 @@ const Header = () => {
               alt={user.username}
               className="user-avatar"
             />
-            <span className="user-name">{user.username}</span>
+            <span className="user-name">{user.name ? user.name : user.username}</span>
           </div>
         )}
 

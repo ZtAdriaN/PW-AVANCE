@@ -1,16 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
+import { getUserProfile, addChatPoint } from '../api';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { addStreamerSecondsByName, addPointsByName } from "../api";
 import DonationPanel from "../components/DonationPanel";
 import DonationHistory from "../components/DonationHistory";
 import AnimationOverlay from "../components/AnimationOverlay2";
 import "./StreamOverlay.css";
 import LevelUpToast from "../components/LevelUpToast";
-import { createStreamByName, finishStreamByName } from "../api";
+import { createStreamByName, finishStreamByName, updateUserLevel } from '../api';
 
 const StreamOverlay = () => {
   const { user, setUser } = useAuth();
+  // Recargar usuario SIEMPRE al entrar a la página del chat
+  useEffect(() => {
+    if (user && user.id) {
+      getUserProfile(user.id).then(data => {
+        if (data && data.name) {
+          setUser({ ...user, name: data.name });
+        }
+      });
+    }
+  }, [user?.id]);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -69,10 +79,10 @@ const StreamOverlay = () => {
         setStreamDuration(prev => prev + 1);
       }, 1000);
 
-      // Simulación: cada minuto real suma 1 hora simulada
+      // Simulación: cada 10 segundos reales suma 1 hora simulada
       hourInterval = setInterval(() => {
         setSimulatedHours(prev => prev + 1);
-      }, 60000); // 60000 ms = 1 min real
+      }, 10000); // 10000 ms = 10 seg real
 
       // Simular viewers fluctuando
       viewerInterval = setInterval(() => {
@@ -94,19 +104,25 @@ const StreamOverlay = () => {
 
   // Efecto para calcular nivel y mostrar notificación al subir de nivel
   useEffect(() => {
-    // Nivel = horas simuladas (sube cada hora)
+    // Subir de nivel por cada hora simulada
     if (simulatedHours > prevLevelRef.current) {
-      setLevel(simulatedHours);
-      setShowLevelUp(true);
+      setLevel(lvl => {
+        const nextLevel = lvl + 1;
+        setShowLevelUp(true);
+        if (user?.id) {
+          localStorage.setItem(`level_${user.id}`, nextLevel);
+          // Actualizar nivel en la base de datos
+          updateUserLevel(user.name, nextLevel);
+        }
+        setTimeout(() => setShowLevelUp(false), 3000);
+        return nextLevel;
+      });
       prevLevelRef.current = simulatedHours;
-      // Guardar nivel en localStorage para reflejar en Mi Perfil
-      if (user?.id) {
-        localStorage.setItem(`level_${user.id}`, simulatedHours);
-      }
-      // Ocultar toast después de 3 segundos
-      setTimeout(() => setShowLevelUp(false), 3000);
     }
   }, [simulatedHours, user]);
+
+  // Estado para puntos
+  const [points, setPoints] = useState(0);
 
   // Formatear tiempo
   const formatTime = (seconds) => {
@@ -117,30 +133,27 @@ const StreamOverlay = () => {
   };
 
   // Iniciar/Detener stream
-  const toggleStream = () => {
+  const toggleStream = async () => {
     if (!isLive) {
+      // Iniciar stream en backend
+      try {
+        const result = await createStreamByName({
+          name: user?.name,
+          title: streamConfig.title,
+          description: streamConfig.description,
+          config: streamConfig
+        });
+        console.log('Respuesta backend (crear stream):', result);
+      } catch (err) {
+        console.error('Error al iniciar stream:', err);
+      }
       setIsLive(true);
       setViewerCount(Math.floor(Math.random() * 10) + 1);
       setStreamDuration(0);
-      
       // Leer nivel guardado en localStorage
-      let startLevel = 0;
-      if (user?.id) {
-        const storedLevel = localStorage.getItem(`level_${user.id}`);
-        if (storedLevel !== null) {
-          startLevel = Number(storedLevel);
-        }
-      }
-      setSimulatedHours(startLevel);
-      setLevel(startLevel);
-      prevLevelRef.current = startLevel;
-
-      // Registrar stream en base de datos
-      if (user?.name) {
-        const cfg = { quality: streamConfig?.quality || '1080p', category: streamConfig?.category || 'Sin categoría' };
-        createStreamByName(user.name, streamConfig.title, streamConfig.description, cfg).then(() => {
-        }).catch(() => {});
-      }
+      setSimulatedHours(0);
+      setLevel(user?.level || 1);
+      prevLevelRef.current = 0;
 
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
@@ -151,16 +164,20 @@ const StreamOverlay = () => {
         isSystem: true
       }]);
     } else {
+      // Finalizar stream en backend
+      try {
+        const result = await finishStreamByName({
+          name: user?.name,
+          simulatedHours
+        });
+        console.log('Respuesta backend (finalizar stream):', result);
+      } catch (err) {
+        console.error('Error al finalizar stream:', err);
+      }
       setIsLive(false);
       setViewerCount(0);
       // No reiniciar simulatedHours ni level al apagar stream
       // prevLevelRef.current se mantiene
-
-      // Finalizar stream activo en base de datos
-      if (user?.name) {
-        finishStreamByName(user.name).then(() => {
-        }).catch(() => {});
-      }
 
       // Mensaje del sistema
       setChatMessages(prev => [...prev, {
@@ -173,48 +190,6 @@ const StreamOverlay = () => {
     }
   };
 
-  useEffect(() => {
-    let backendInterval;
-    if (isLive && user?.name) {
-      backendInterval = setInterval(() => {
-        setUser(prev => {
-          const shLocal = Number(prev.streamingHours || 0) + 1;
-          const updatedLocal = { ...prev, streamingHours: shLocal };
-          localStorage.setItem('currentUser', JSON.stringify(updatedLocal));
-          return updatedLocal;
-        });
-        addStreamerSecondsByName(user.name, 10).then((r) => {
-          setUser(prev => {
-            const shRemote = Number(r?.streamingHours ?? prev.streamingHours);
-            const updated = { ...prev, streamingHours: shRemote };
-            localStorage.setItem('currentUser', JSON.stringify(updated));
-            return updated;
-          });
-        }).catch(() => {});
-        addPointsByName(user.name, 10).then((rp) => {
-          setUser(prev => {
-            const updated = {
-              ...prev,
-              level: Number(rp?.level ?? prev.level ?? 1),
-              points: Number(rp?.points ?? prev.points ?? 0),
-              pointsToNextLevel: Number(rp?.pointsToNextLevel ?? prev.pointsToNextLevel ?? 100)
-            };
-            localStorage.setItem('currentUser', JSON.stringify(updated));
-            return updated;
-          });
-          if (Number(rp?.level ?? 0) > Number(user.level ?? 0)) {
-            setLevel(Number(rp.level));
-            setShowLevelUp(true);
-            setTimeout(() => setShowLevelUp(false), 3000);
-          }
-        }).catch(() => {});
-      }, 10000);
-    }
-    return () => {
-      if (backendInterval) clearInterval(backendInterval);
-    };
-  }, [isLive, user?.id]);
-
   // Enviar mensaje al chat
   const [storeItems, setStoreItems] = useState([]);
 
@@ -226,18 +201,35 @@ const StreamOverlay = () => {
   }, [user?.id]);
 
   const handleChatSubmit = (e) => {
+    console.log('Valor de user en frontend:', user);
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
 
     const message = {
       id: Date.now(),
-      user: user.username,
+      user: user.name,
       message: newMessage.trim(),
       timestamp: Date.now()
     };
 
     setChatMessages(prev => [...prev, message]);
     setNewMessage('');
+
+    // Enviar mensaje y streamId al backend para sumar punto y guardar mensaje
+    const streamId = streamConfig.id || 1; // Ajusta según tu lógica de stream actual
+    addChatPoint(user.id, newMessage.trim(), streamId)
+      .then(result => {
+        if (result && result.success) {
+          getUserProfile(user.id).then(data => {
+            if (data) {
+              setUser(data);
+            }
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error al sumar punto por chat:', err);
+      });
   };
 
 

@@ -21,6 +21,11 @@ module.exports = (sequelize) => {
       },
     },
     password: {
+      isFeatured: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -28,6 +33,11 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'user',
+    },
+    level: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
     },
     isStreamer: {
       type: DataTypes.BOOLEAN,
@@ -37,33 +47,27 @@ module.exports = (sequelize) => {
     profilePicture: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: '/src/assets/default-avatar.svg',
+      defaultValue: '/images/default-avatar.svg',
+    },
+    HorasTotales: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    points: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    pointsToNextLevel: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 100,
     },
     gems: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1000,
-    },
-    streamingHours: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-      defaultValue: 0,
-      field: 'HorasTotales'
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1
-    },
-    points: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    pointsToNextLevel: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 100
     }
   }, {
     timestamps: false,

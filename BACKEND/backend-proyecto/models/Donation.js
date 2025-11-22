@@ -11,9 +11,21 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    productId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    product: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     streamerId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    streamerName: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     amount: {
       type: DataTypes.INTEGER,
